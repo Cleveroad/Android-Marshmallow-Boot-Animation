@@ -50,4 +50,13 @@ public class DrawableUtils {
 		double angle = Math.toRadians(angleInDegrees);
 		return (float) (Math.sin(angle) * (pX - cX) + Math.cos(angle) * (pY - cY) + cY);
 	}
+
+	public static boolean between(float value, float start, float end) {
+		if (start > end) {
+			float tmp = start;
+			start = end;
+			end = tmp;
+		}
+		return value >= start && value <= end;
+	}
 }
