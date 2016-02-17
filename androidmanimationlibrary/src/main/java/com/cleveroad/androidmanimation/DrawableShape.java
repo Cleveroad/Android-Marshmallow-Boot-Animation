@@ -20,8 +20,9 @@ public abstract class DrawableShape implements DrawableObject {
 
 	@Override
 	public final void update(@NonNull RectF bounds, long dt) {
-		float l = bounds.left + getSpacingFraction() * bounds.width();
-		float t = bounds.top + getSpacingFraction() * bounds.height();
+		float spacing = (1 - getSizeFraction()) / 2f;
+		float l = bounds.left + spacing * bounds.width();
+		float t = bounds.top + spacing * bounds.height();
 		float r = l + getSizeFraction() * bounds.width();
 		float b = t + getSizeFraction() * bounds.height();
 		getBounds().set(l, t, r, b);
@@ -34,8 +35,6 @@ public abstract class DrawableShape implements DrawableObject {
 
 	protected abstract float getSizeFraction();
 
-	protected abstract float getSpacingFraction();
-
 	protected abstract void update(@NonNull RectF bounds, long dt, float ddt);
 
 	float enlarge(float startSize, float endSize, float dt, float maxDt, float length) {
@@ -43,8 +42,8 @@ public abstract class DrawableShape implements DrawableObject {
 		return startSize + (endSize - startSize) * t;
 	}
 
-	float reduce(float startSize, float endSize, float dt, float maxDt, float length) {
-		float t = (maxDt - dt) / length;
+	float reduce(float startSize, float endSize, float value, float max, float length) {
+		float t = (max - value) / length;
 		return endSize + (startSize - endSize) * t;
 	}
 
