@@ -68,7 +68,7 @@ public class LoadingAnimation extends View {
 		layers[0] = new FirstLayer(bluePaint, greenPaint, yellowPaint, bgPaint);
 		layers[1] = new SecondLayer(redPaint, yellowPaint, bgPaint);
 		layers[2] = new ThirdLayer(redPaint, greenPaint, yellowPaint);
-		layers[3] = new FourthLayer(redPaint, greenPaint, bluePaint, yellowPaint);
+		layers[3] = new FourthLayer(redPaint, greenPaint, bluePaint, yellowPaint, bgPaint);
 	}
 
 	@Override
