@@ -39,7 +39,7 @@ public class FirstLayer extends Layer {
 
 	private static final class GreenCircles extends DrawableShape {
 
-		private static final float FRACTION_START = 0;
+		private static final float FRACTION_START = Constants.FIRST_FRAME_FRACTION;
 		private static final float FRACTION_END = 50 * Constants.FRAME_SPEED;
 
 		private static final float SIZE_FRACTION = 0.75f;
@@ -241,7 +241,7 @@ public class FirstLayer extends Layer {
 
 	private static final class BlueCircle extends DrawableShape {
 
-		private static final float SMALL_REDUCE_FRACTION_START = 0;
+		private static final float SMALL_REDUCE_FRACTION_START = Constants.FIRST_FRAME_FRACTION;
 		private static final float SMALL_REDUCE_FRACTION_END = 12 * Constants.FRAME_SPEED;
 
 		private static final float SMALL_ENLARGE_FRACTION_START = 44 * Constants.FRAME_SPEED;
@@ -251,7 +251,7 @@ public class FirstLayer extends Layer {
 		private static final float LARGE_REDUCE_FRACTION_END = 80 * Constants.FRAME_SPEED;
 
 		private static final float LARGE_ENLARGE_FRACTION_START = 133 * Constants.FRAME_SPEED;
-		private static final float LARGE_ENLARGE_FRACTION_END = 151 * Constants.FRAME_SPEED;
+		private static final float LARGE_ENLARGE_FRACTION_END = Constants.LAST_FRAME_FRACTION;
 
 
 		private static final float SIZE_FRACTION = 0.6f;

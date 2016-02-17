@@ -47,9 +47,39 @@ public class SecondLayer extends Layer {
 
 	private static final class RedSunRays extends DrawableShape {
 
+		private static final float ROTATION_FRACTION_START = 54 * Constants.FRAME_SPEED;
+		private static final float ROTATION_FRACTION_END = 88 * Constants.FRAME_SPEED;
+
+		private static final float ENLARGE_1_FRACTION_START = 48 * Constants.FRAME_SPEED;
+		private static final float ENLARGE_1_FRACTION_END = 57 * Constants.FRAME_SPEED;
+
+		private static final float REDUCE_1_FRACTION_START = 58 * Constants.FRAME_SPEED;
+		private static final float REDUCE_1_FRACTION_END = 64 * Constants.FRAME_SPEED;
+
+		private static final float CIRCLES_MOVEMENT_FRACTION_START = 63 * Constants.FRAME_SPEED;
+		private static final float CIRCLES_MOVEMENT_FRACTION_END = 68 * Constants.FRAME_SPEED;
+
+		private static final float CIRCLES_VISIBILITY_FRACTION_START = 60 * Constants.FRAME_SPEED;
+		private static final float CIRCLES_VISIBILITY_FRACTION_END = 62 * Constants.FRAME_SPEED;
+
+		private static final float RAYS_VISIBILITY_1_FRACTION_START = 65 * Constants.FRAME_SPEED;
+		private static final float RAYS_VISIBILITY_1_FRACTION_END = 68 * Constants.FRAME_SPEED;
+
+		private static final float ENLARGE_2_FRACTION_START = 114 * Constants.FRAME_SPEED;
+		private static final float ENLARGE_2_FRACTION_END = 126 * Constants.FRAME_SPEED;
+
+		private static final float REDUCE_2_FRACTION_START = 127 * Constants.FRAME_SPEED;
+		private static final float REDUCE_2_FRACTION_END = 137 * Constants.FRAME_SPEED;
+
+		private static final float RAYS_VISIBILITY_2_FRACTION_START = 134 * Constants.FRAME_SPEED;
+		private static final float RAYS_VISIBILITY_2_FRACTION_END = 136 * Constants.FRAME_SPEED;
+
+		private static final float SWAP_FRACTION = 90 * Constants.FRAME_SPEED;
+
 		private static final float SIZE_FRACTION = 0.8f;
 
 		private static final int RAYS_COUNT = 8;
+		private static final float END_ANGLE = -90;
 
 		private final Paint dotsPaint;
 		private final RectF rect;
@@ -73,83 +103,90 @@ public class SecondLayer extends Layer {
 
 		@Override
 		protected void update(@NonNull RectF bounds, long dt, float ddt) {
-			float curStep = IDLE_1_FRACTION - 100f * Constants.SPEED_COEFFICIENT / Constants.TOTAL_DURATION;
-			if (ddt <= curStep) {
+			draw = true;
+			dotSize = 0;
+			if (ddt < ENLARGE_1_FRACTION_START || ddt > REDUCE_2_FRACTION_END) {
 				draw = false;
 				return;
 			}
-			draw = true;
+
+			if (DrawableUtils.between(ddt, ROTATION_FRACTION_START, ROTATION_FRACTION_END)) {
+				float t = DrawableUtils.normalize(ddt, ROTATION_FRACTION_START, ROTATION_FRACTION_END);
+				angle = t * END_ANGLE;
+			}
+
 			float width = getBounds().width() * 0.07f;
 			float height = getBounds().width() * 0.24f;
 			float halfSize = width / 2f;
 			float cx = getBounds().centerX();
-			float rotationDelayOffset = curStep + ROTATION_DELAY_FRACTION;
-			float halfAnimationFraction = LONG_ANIMATION_FRACTION / 2f;
-			float quadAnimationFraction = LONG_ANIMATION_FRACTION / 4f;
-			float halfDurationOffset = curStep + halfAnimationFraction;
-			float reverseOffset = curStep + quadAnimationFraction;
-			float movementOffset = halfDurationOffset + quadAnimationFraction;
-			curStep += LONG_ANIMATION_FRACTION;
-			if (ddt <= curStep) {
-				if (ddt >= rotationDelayOffset) {
-					float t = DrawableUtils.normalize(ddt, rotationDelayOffset, curStep);
-					t = interpolator.getInterpolation(t);
-					angle = -1 * t * 90;
-				}
-				if (ddt <= halfDurationOffset) {
-					getPaint().setAlpha(255);
-					dotsPaint.setAlpha(0);
-					float l, t, r, b;
-					l = cx - halfSize;
-					r = cx + halfSize;
-					if (ddt <= reverseOffset) {
-						b = getBounds().top + height;
-						t = b - enlarge(width, height, ddt, reverseOffset, quadAnimationFraction);
-					} else {
-						t = getBounds().top;
-						b = t + reduce(height, width, ddt, halfDurationOffset, quadAnimationFraction);
-					}
-					rect.set(l, t, r, b);
-					dotSize = 0;
-				} else {
-					float startPoint = getBounds().top + height - halfSize;
-					dotSize = width;
-					dotCx = cx;
-					float t = DrawableUtils.normalize(ddt, halfDurationOffset, curStep);
-					float dotsK = DrawableUtils.triangle(t, 0, 0, 1, 0.33f, 1, 1);
-					float lineK = DrawableUtils.triangle(t, 1, 0, 1, 0.66f, 0, 1);
-					dotsPaint.setAlpha((int) (dotsK * 255));
-					getPaint().setAlpha((int) (lineK * 255));
-					if (ddt <= movementOffset) {
-						dotCy = startPoint;
-					} else {
-						dotCy = reduce(startPoint, getBounds().top + halfSize, ddt, curStep, quadAnimationFraction);
-					}
-				}
+
+			if (DrawableUtils.between(ddt, ENLARGE_1_FRACTION_START, ENLARGE_1_FRACTION_END)) {
+				float l, t, r, b;
+				l = cx - halfSize;
+				r = cx + halfSize;
+				b = getBounds().top + height;
+				t = b - enlarge(width, height, ddt, ENLARGE_1_FRACTION_END, ENLARGE_1_FRACTION_END - ENLARGE_1_FRACTION_START);
+				rect.set(l, t, r, b);
+			}
+			if (DrawableUtils.between(ddt, REDUCE_1_FRACTION_START, REDUCE_1_FRACTION_END)) {
+				float l, t, r, b;
+				l = cx - halfSize;
+				r = cx + halfSize;
+				t = getBounds().top;
+				b = t + reduce(height, width, ddt, REDUCE_1_FRACTION_END, REDUCE_1_FRACTION_END - REDUCE_1_FRACTION_START);
+				rect.set(l, t, r, b);
+			}
+
+			if (DrawableUtils.between(ddt, ENLARGE_2_FRACTION_START, ENLARGE_2_FRACTION_END)) {
+				float l, t, r, b;
+				l = cx - halfSize;
+				r = cx + halfSize;
+				t = getBounds().top;
+				b = t + enlarge(width, height, ddt, ENLARGE_2_FRACTION_END, ENLARGE_2_FRACTION_END - ENLARGE_2_FRACTION_START);
+				rect.set(l, t, r, b);
+			}
+			if (DrawableUtils.between(ddt, REDUCE_2_FRACTION_START, REDUCE_2_FRACTION_END)) {
+				float l, t, r, b;
+				l = cx - halfSize;
+				r = cx + halfSize;
+				b = getBounds().top + height;
+				t = b - reduce(height, width, ddt, REDUCE_2_FRACTION_END, REDUCE_2_FRACTION_END - REDUCE_2_FRACTION_START);
+				rect.set(l, t, r, b);
+			}
+
+			float startPoint = getBounds().top + height - halfSize;
+			if (DrawableUtils.between(ddt, CIRCLES_VISIBILITY_FRACTION_START, SWAP_FRACTION)) {
+				dotCx = cx;
+				if (dotCy == 0)
+					dotCy = startPoint;
+				dotSize = width;
 			} else {
-				curStep = 1 - LONG_ANIMATION_FRACTION - SIZE_ANIMATION_FRACTION * 2;
-				if (ddt > curStep) {
-					dotSize = 0;
-					getPaint().setAlpha(255);
-					dotsPaint.setAlpha(0);
-					halfDurationOffset = curStep + SIZE_ANIMATION_FRACTION;
-					curStep += SIZE_ANIMATION_FRACTION * 4;
-					if (ddt <= curStep) {
-						float l, t, r, b;
-						l = cx - halfSize;
-						r = cx + halfSize;
-						if (ddt <= halfDurationOffset) {
-							t = getBounds().top;
-							b = t + enlarge(width, height, ddt, halfDurationOffset, SIZE_ANIMATION_FRACTION*2);
-						} else {
-							b = getBounds().top + height;
-							t = b - reduce(height, width, ddt, curStep, SIZE_ANIMATION_FRACTION*2);
-						}
-						rect.set(l, t, r, b);
-					} else {
-						draw = false;
-					}
-				}
+				dotSize = 0;
+			}
+
+			if (DrawableUtils.between(ddt, CIRCLES_MOVEMENT_FRACTION_START, CIRCLES_VISIBILITY_FRACTION_END)) {
+				float t = DrawableUtils.normalize(ddt, CIRCLES_MOVEMENT_FRACTION_START, CIRCLES_VISIBILITY_FRACTION_END);
+				dotsPaint.setAlpha((int) (t * 255));
+			}
+			if (DrawableUtils.between(ddt, CIRCLES_MOVEMENT_FRACTION_START, CIRCLES_MOVEMENT_FRACTION_END)) {
+				dotCy = reduce(startPoint, getBounds().top + halfSize, ddt, CIRCLES_MOVEMENT_FRACTION_END, CIRCLES_MOVEMENT_FRACTION_END - CIRCLES_MOVEMENT_FRACTION_START);
+				dotsPaint.setAlpha(255);
+			}
+
+
+			if (DrawableUtils.between(ddt, RAYS_VISIBILITY_1_FRACTION_START, RAYS_VISIBILITY_1_FRACTION_END)) {
+				float t = DrawableUtils.normalize(ddt, RAYS_VISIBILITY_1_FRACTION_START, RAYS_VISIBILITY_1_FRACTION_END);
+				getPaint().setAlpha((int) ((1 - t) * 255));
+			}
+
+			if (DrawableUtils.between(ddt, RAYS_VISIBILITY_2_FRACTION_START, RAYS_VISIBILITY_2_FRACTION_END)) {
+				float t = DrawableUtils.normalize(ddt, RAYS_VISIBILITY_2_FRACTION_START, RAYS_VISIBILITY_2_FRACTION_END);
+				getPaint().setAlpha((int) ((1 - t) * 255));
+			}
+
+			if (ddt >= SWAP_FRACTION) {
+				getPaint().setAlpha(255);
+				dotsPaint.setAlpha(0);
 			}
 		}
 
@@ -175,7 +212,17 @@ public class SecondLayer extends Layer {
 
 	private static final class YellowCircleInner extends DrawableShape {
 
-		private static final float SIZE_FRACTION = 0.4f;
+		private static final float ENLARGE_FRACTION_START = 65 * Constants.FRAME_SPEED;
+		private static final float ENLARGE_FRACTION_END = 72 * Constants.FRAME_SPEED;
+
+		private static final float MORE_ENLARGE_FRACTION_START = 97 * Constants.FRAME_SPEED;
+		private static final float MORE_ENLARGE_FRACTION_END = 110 * Constants.FRAME_SPEED;
+
+		private static final float MORE_REDUCE_FRACTION_START = 110 * Constants.FRAME_SPEED;
+		private static final float MORE_REDUCE_FRACTION_END = 121 * Constants.FRAME_SPEED;
+
+
+		private static final float SIZE_FRACTION = 0.6f;
 
 		private float size;
 
@@ -194,25 +241,20 @@ public class SecondLayer extends Layer {
 		}
 
 		private float getSizeFraction(float ddt) {
-			float curStep = IDLE_1_FRACTION + SIZE_ANIMATION_FRACTION;
-			if (ddt <= curStep) {
-				return  0;
+			if (DrawableUtils.between(ddt, ENLARGE_FRACTION_START, ENLARGE_FRACTION_END)) {
+				return enlarge(0.5f, 0.65f, ddt, ENLARGE_FRACTION_END, ENLARGE_FRACTION_END - ENLARGE_FRACTION_START);
 			}
-			curStep += 2 * SIZE_ANIMATION_FRACTION;
-			if (ddt <= curStep) {
-				return enlarge(0, 1, ddt, curStep, SIZE_ANIMATION_FRACTION * 2);
+			if (DrawableUtils.between(ddt, ENLARGE_FRACTION_END, MORE_ENLARGE_FRACTION_START)) {
+				return 0.65f;
 			}
-			curStep = 1 - LONG_ANIMATION_FRACTION - SIZE_ANIMATION_FRACTION * 3;
-			if (ddt <= curStep) {
-				return  1;
+			if (DrawableUtils.between(ddt, MORE_ENLARGE_FRACTION_START, MORE_ENLARGE_FRACTION_END)) {
+				return enlarge(0.65f, 0.8f, ddt, MORE_ENLARGE_FRACTION_END, MORE_ENLARGE_FRACTION_END - MORE_ENLARGE_FRACTION_START);
 			}
-			curStep += SIZE_ANIMATION_FRACTION;
-			if (ddt <= curStep) {
-				return enlarge(1, 1.3f, ddt, curStep, SIZE_ANIMATION_FRACTION);
+			if (DrawableUtils.between(ddt, MORE_ENLARGE_FRACTION_END, MORE_REDUCE_FRACTION_START)) {
+				return 0.8f;
 			}
-			curStep += SIZE_ANIMATION_FRACTION * 2;
-			if (ddt <= curStep) {
-				return reduce(1.3f, 0, ddt, curStep, SIZE_ANIMATION_FRACTION * 2);
+			if (DrawableUtils.between(ddt, MORE_REDUCE_FRACTION_START, MORE_REDUCE_FRACTION_END)) {
+				return reduce(0.8f, 0.5f, ddt, MORE_REDUCE_FRACTION_END, MORE_REDUCE_FRACTION_END - MORE_REDUCE_FRACTION_START);
 			}
 			return 0;
 		}
@@ -229,13 +271,39 @@ public class SecondLayer extends Layer {
 
 	private static final class RedRing extends DrawableShape {
 
+		private static final float FRACTION_START = Constants.FIRST_FRAME_FRACTION;
+
+		private static final float YELLOW_ENLARGE_FRACTION_START = 7 * Constants.FRAME_SPEED;
+		private static final float YELLOW_ENLARGE_FRACTION_END = 19 * Constants.FRAME_SPEED;
+		private static final float YELLOW_MEDIUM_ENLARGE_FRACTION_START = 52 * Constants.FRAME_SPEED;
+		private static final float YELLOW_MEDIUM_ENLARGE_FRACTION_END = 62 * Constants.FRAME_SPEED;
+		private static final float YELLOW_MEDIUM_REDUCE_FRACTION_START = 131 * Constants.FRAME_SPEED;
+		private static final float YELLOW_MEDIUM_REDUCE_FRACTION_END = 139 * Constants.FRAME_SPEED;
+		private static final float YELLOW_RESTORE_FRACTION_START = 140 * Constants.FRAME_SPEED;
+		private static final float YELLOW_RESTORE_FRACTION_END = Constants.LAST_FRAME_FRACTION;
+
+		private static final float BLACK_REDUCED_FRACTION = 12 * Constants.FRAME_SPEED;
+		private static final float BLACK_RESTORE_FRACTION_START = 139 * Constants.FRAME_SPEED;
+		private static final float BLACK_RESTORE_FRACTION_END = Constants.LAST_FRAME_FRACTION;
+
+		private static final float RED_REDUCE_FRACTION_START = 50 * Constants.FRAME_SPEED;
+		private static final float RED_REDUCE_FRACTION_END = 60 * Constants.FRAME_SPEED;
+		private static final float RED_ENLARGE_FRACTION_START = 125 * Constants.FRAME_SPEED;
+		private static final float RED_ENLARGE_FRACTION_END = 139 * Constants.FRAME_SPEED;
+
+
 		private static final float SIZE_FRACTION = 0.6f;
 
-		private static final float YELLOW_DEFAULT_WIDTH = 0.25f;
-		private static final float YELLOW_LARGE_WIDTH = 1.1f;
+		private static final float YELLOW_DEFAULT_SIZE = 0.25f;
+		private static final float YELLOW_LARGE_SIZE = 1.1f;
 
-		private static final float BLACK_DEFAULT_WIDTH = 0.5f;
-		private static final float BLACK_SMALL_WIDTH = 0.1f;
+		private static final float BLACK_DEFAULT_SIZE = 0.5f;
+		private static final float BLACK_SMALL_SIZE = 0.1f;
+
+		private static final float RED_DEFAULT_SIZE = 1f;
+		private static final float RED_SMALL_SIZE = 0.5f;
+
+		private static final float ZERO_SIZE = 0f;
 
 		private final Paint bgPaint;
 		private final Paint yellowPaint;
@@ -262,82 +330,60 @@ public class SecondLayer extends Layer {
 		}
 
 		private float computeRedSizeFraction(float ddt) {
-			float curStep = IDLE_1_FRACTION;
-			if (ddt <= curStep) {
-				return 1;
+			if (DrawableUtils.between(ddt, FRACTION_START, RED_REDUCE_FRACTION_START)) {
+				return RED_DEFAULT_SIZE;
 			}
-
-			curStep += SIZE_ANIMATION_FRACTION;
-			if (ddt <= curStep) {
-				return reduce(1, 0.5f, ddt, curStep, SIZE_ANIMATION_FRACTION);
+			if (DrawableUtils.between(ddt, RED_REDUCE_FRACTION_START, RED_REDUCE_FRACTION_END)) {
+				return reduce(RED_DEFAULT_SIZE, RED_SMALL_SIZE, ddt, RED_REDUCE_FRACTION_END, RED_REDUCE_FRACTION_END - RED_REDUCE_FRACTION_START);
 			}
-
-			curStep = 1 - LONG_ANIMATION_FRACTION - SIZE_ANIMATION_FRACTION;
-			if (ddt <= curStep) {
-				return 0.5f;
+			if (DrawableUtils.between(ddt, RED_REDUCE_FRACTION_END, RED_ENLARGE_FRACTION_START)) {
+				return RED_SMALL_SIZE;
 			}
-
-			curStep += LONG_ANIMATION_FRACTION;
-			if (ddt <= curStep) {
-				return enlarge(0.5f, 1, ddt, curStep, LONG_ANIMATION_FRACTION);
+			if (DrawableUtils.between(ddt, RED_ENLARGE_FRACTION_START, RED_ENLARGE_FRACTION_END)) {
+				return enlarge(RED_SMALL_SIZE, RED_DEFAULT_SIZE, ddt, RED_ENLARGE_FRACTION_END, RED_ENLARGE_FRACTION_END - RED_ENLARGE_FRACTION_START);
 			}
-			return 1;
+			return RED_DEFAULT_SIZE;
 		}
 
 		private float computeBlackSizeFraction(float ddt) {
-			float curStep = SIZE_ANIMATION_FRACTION * 2;
-			if (ddt <= curStep) {
-				return BLACK_DEFAULT_WIDTH;
+			if (DrawableUtils.between(ddt, FRACTION_START, BLACK_REDUCED_FRACTION)) {
+				return BLACK_DEFAULT_SIZE;
 			}
-			curStep = 1 - LONG_ANIMATION_FRACTION - SIZE_ANIMATION_FRACTION;
-			if (ddt <= curStep) {
-				return BLACK_SMALL_WIDTH;
-
+			if (DrawableUtils.between(ddt, BLACK_REDUCED_FRACTION, BLACK_RESTORE_FRACTION_START)) {
+				return BLACK_SMALL_SIZE;
 			}
-			curStep = 1;
-			if (ddt <= curStep) {
-				return enlarge(BLACK_SMALL_WIDTH, BLACK_DEFAULT_WIDTH, ddt, curStep, SIZE_ANIMATION_FRACTION);
+			if (DrawableUtils.between(ddt, BLACK_RESTORE_FRACTION_START, BLACK_RESTORE_FRACTION_END)) {
+				return enlarge(BLACK_SMALL_SIZE, BLACK_DEFAULT_SIZE, ddt, BLACK_RESTORE_FRACTION_END, BLACK_RESTORE_FRACTION_END - BLACK_RESTORE_FRACTION_START);
 			}
-			return 0;
+			return ZERO_SIZE;
 		}
 
 		private float computeYellowSizeFraction(float ddt) {
-			float curStep = SIZE_ANIMATION_FRACTION;
-			if (ddt <= curStep) {
-				return YELLOW_DEFAULT_WIDTH;
+			if (DrawableUtils.between(ddt, FRACTION_START, YELLOW_ENLARGE_FRACTION_START)) {
+				return YELLOW_DEFAULT_SIZE;
 			}
-
-			curStep += SIZE_ANIMATION_FRACTION;
-			if (ddt <= curStep) {
-				return enlarge(YELLOW_DEFAULT_WIDTH, YELLOW_LARGE_WIDTH, ddt, curStep, SIZE_ANIMATION_FRACTION);
+			if (DrawableUtils.between(ddt, YELLOW_ENLARGE_FRACTION_START, YELLOW_ENLARGE_FRACTION_END)) {
+				return enlarge(YELLOW_DEFAULT_SIZE, YELLOW_LARGE_SIZE, ddt, YELLOW_ENLARGE_FRACTION_END, YELLOW_ENLARGE_FRACTION_END - YELLOW_ENLARGE_FRACTION_START);
 			}
-
-			curStep = IDLE_1_FRACTION;
-			if (ddt <= curStep) {
-				return 0;
+			if (DrawableUtils.between(ddt, YELLOW_ENLARGE_FRACTION_END, YELLOW_MEDIUM_ENLARGE_FRACTION_START)) {
+				return ZERO_SIZE;
 			}
-
-			curStep += SIZE_ANIMATION_FRACTION;
-			if (ddt <= curStep) {
-				return enlarge(0, YELLOW_DEFAULT_WIDTH, ddt, curStep, SIZE_ANIMATION_FRACTION);
+			if (DrawableUtils.between(ddt, YELLOW_MEDIUM_ENLARGE_FRACTION_START, YELLOW_MEDIUM_ENLARGE_FRACTION_END)) {
+				return enlarge(ZERO_SIZE, YELLOW_DEFAULT_SIZE, ddt, YELLOW_MEDIUM_ENLARGE_FRACTION_END, YELLOW_MEDIUM_ENLARGE_FRACTION_END - YELLOW_MEDIUM_ENLARGE_FRACTION_START);
 			}
-
-			curStep = 1 - SIZE_ANIMATION_FRACTION * 2;
-			if (ddt <= curStep) {
-				return YELLOW_DEFAULT_WIDTH;
+			if (DrawableUtils.between(ddt, YELLOW_MEDIUM_ENLARGE_FRACTION_END, YELLOW_MEDIUM_REDUCE_FRACTION_START)) {
+				return YELLOW_DEFAULT_SIZE;
 			}
-
-			curStep += SIZE_ANIMATION_FRACTION;
-			if (ddt <= curStep) {
-				return reduce(YELLOW_DEFAULT_WIDTH, 0, ddt, curStep, SIZE_ANIMATION_FRACTION);
+			if (DrawableUtils.between(ddt, YELLOW_MEDIUM_REDUCE_FRACTION_START, YELLOW_MEDIUM_REDUCE_FRACTION_END)) {
+				return reduce(YELLOW_DEFAULT_SIZE, ZERO_SIZE, ddt, YELLOW_MEDIUM_REDUCE_FRACTION_END, YELLOW_MEDIUM_REDUCE_FRACTION_END - YELLOW_MEDIUM_REDUCE_FRACTION_START);
 			}
-
-			curStep += SIZE_ANIMATION_FRACTION;
-			if (ddt <= curStep) {
-				return enlarge(0, YELLOW_DEFAULT_WIDTH, ddt, curStep, SIZE_ANIMATION_FRACTION);
+			if (DrawableUtils.between(ddt, YELLOW_MEDIUM_REDUCE_FRACTION_END, YELLOW_RESTORE_FRACTION_START)) {
+				return ZERO_SIZE;
 			}
-
-			return 0;
+			if (DrawableUtils.between(ddt, YELLOW_RESTORE_FRACTION_START, YELLOW_RESTORE_FRACTION_END)) {
+				return enlarge(ZERO_SIZE, YELLOW_DEFAULT_SIZE, ddt, YELLOW_RESTORE_FRACTION_END, YELLOW_RESTORE_FRACTION_END - YELLOW_RESTORE_FRACTION_START);
+			}
+			return ZERO_SIZE;
 		}
 
 		@Override
