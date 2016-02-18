@@ -38,7 +38,7 @@ public abstract class DrawableShape implements DrawableObject {
 	protected abstract void update(@NonNull RectF bounds, long dt, float ddt);
 
 	float enlarge(float startSize, float endSize, float dt, float maxDt, float length) {
-		float t = (1 - (maxDt - dt) / length);
+		float t = (1f - (maxDt - dt) / length);
 		return startSize + (endSize - startSize) * t;
 	}
 
