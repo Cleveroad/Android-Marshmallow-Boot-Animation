@@ -1,9 +1,9 @@
 package com.cleveroad.androidmanimation;
 
 /**
- * Created by Александр on 15.02.2016.
+ * Constants class.
  */
-public class Constants {
+class Constants {
 
 	private Constants() {
 	}

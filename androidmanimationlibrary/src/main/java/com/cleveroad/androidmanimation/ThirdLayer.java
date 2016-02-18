@@ -6,9 +6,9 @@ import android.graphics.RectF;
 import android.support.annotation.NonNull;
 
 /**
- * Created by Александр on 16.02.2016.
+ * Third layer of animation.
  */
-public class ThirdLayer extends Layer {
+class ThirdLayer extends Layer {
 
 	private final DrawableObject[] objects;
 
@@ -20,7 +20,7 @@ public class ThirdLayer extends Layer {
 	}
 
 	@Override
-	protected void update(@NonNull RectF bounds, long dt, float ddt) {
+	public void update(@NonNull RectF bounds, long dt) {
 		for (DrawableObject object : objects) {
 			object.update(bounds, dt);
 		}
@@ -33,7 +33,16 @@ public class ThirdLayer extends Layer {
 		}
 	}
 
-	private static final class GreenRing extends DrawableShape {
+	@Override
+	public void reset() {
+		for (DrawableObject object : objects) {
+			if (object instanceof Resetable) {
+				((Resetable) object).reset();
+			}
+		}
+	}
+
+	private static final class GreenRing extends DrawableObjectImpl {
 
 		private static final float SIZE_FRACTION = 0.75f;
 		private static final float GREEN_DEFAULT_SIZE = 0.6f;
@@ -120,7 +129,8 @@ public class ThirdLayer extends Layer {
 				return 0;
 			}
 			if (DrawableUtils.between(ddt, BLACK_ENLARGE_FRACTION_START, BLACK_ENLARGE_FRACTION_END)) {
-				return enlarge(BLACK_DEFAULT_SIZE, BLACK_LARGE_SIZE, ddt, BLACK_ENLARGE_FRACTION_END, BLACK_ENLARGE_FRACTION_END - BLACK_ENLARGE_FRACTION_START);
+				float t = DrawableUtils.normalize(ddt, BLACK_ENLARGE_FRACTION_START, BLACK_ENLARGE_FRACTION_END);
+				return DrawableUtils.enlarge(BLACK_DEFAULT_SIZE, BLACK_LARGE_SIZE, t);
 			}
 			if (DrawableUtils.between(ddt, BLACK_ENLARGE_FRACTION_END, GREEN_ENLARGE_FRACTION_END)) {
 				return BLACK_LARGE_SIZE;
@@ -129,7 +139,8 @@ public class ThirdLayer extends Layer {
 				return BLACK_ARC_DEFAULT_SIZE;
 			}
 			if (DrawableUtils.between(ddt, ARC_SIZE_CHANGE_FRACTION_START, ARC_SIZE_CHANGE_FRACTION_END)) {
-				return reduce(BLACK_ARC_DEFAULT_SIZE, BLACK_ARC_SMALL_SIZE, ddt, ARC_SIZE_CHANGE_FRACTION_END, ARC_SIZE_CHANGE_FRACTION_END - ARC_SIZE_CHANGE_FRACTION_START);
+				float t = DrawableUtils.normalize(ddt, ARC_SIZE_CHANGE_FRACTION_START, ARC_SIZE_CHANGE_FRACTION_END);
+				return DrawableUtils.reduce(BLACK_ARC_DEFAULT_SIZE, BLACK_ARC_SMALL_SIZE, t);
 			}
 			return 0;
 		}
@@ -140,19 +151,22 @@ public class ThirdLayer extends Layer {
 				return GREEN_DEFAULT_SIZE;
 			}
 			if (DrawableUtils.between(ddt, GREEN_ENLARGE_FRACTION_START, GREEN_ENLARGE_FRACTION_END)) {
-				return enlarge(GREEN_DEFAULT_SIZE, GREEN_LARGE_SIZE, ddt, GREEN_ENLARGE_FRACTION_END, GREEN_ENLARGE_FRACTION_END - GREEN_ENLARGE_FRACTION_START);
+				float t = DrawableUtils.normalize(ddt, GREEN_ENLARGE_FRACTION_START, GREEN_ENLARGE_FRACTION_END);
+				return DrawableUtils.enlarge(GREEN_DEFAULT_SIZE, GREEN_LARGE_SIZE, t);
 			}
 			if (DrawableUtils.between(ddt, GREEN_ENLARGE_FRACTION_END, ARC_SIZE_CHANGE_FRACTION_START)) {
 				return GREEN_LARGE_SIZE;
 			}
 			if (DrawableUtils.between(ddt, ARC_SIZE_CHANGE_FRACTION_START, ARC_SIZE_CHANGE_FRACTION_END)) {
-				return reduce(GREEN_LARGE_SIZE, GREEN_SMALL_SIZE, ddt, ARC_SIZE_CHANGE_FRACTION_END, ARC_SIZE_CHANGE_FRACTION_END - ARC_SIZE_CHANGE_FRACTION_START);
+				float t = DrawableUtils.normalize(ddt, ARC_SIZE_CHANGE_FRACTION_START, ARC_SIZE_CHANGE_FRACTION_END);
+				return DrawableUtils.reduce(GREEN_LARGE_SIZE, GREEN_SMALL_SIZE, t);
 			}
 			if (DrawableUtils.between(ddt, ARC_SIZE_CHANGE_FRACTION_END, RESTORE_FRACTION_START)) {
 				return GREEN_SMALL_SIZE;
 			}
 			if (DrawableUtils.between(ddt, RESTORE_FRACTION_START, RESTORE_FRACTION_END)) {
-				return enlarge(GREEN_SMALL_SIZE, GREEN_DEFAULT_SIZE, ddt, RESTORE_FRACTION_END, RESTORE_FRACTION_END - RESTORE_FRACTION_START);
+				float t = DrawableUtils.normalize(ddt, RESTORE_FRACTION_START, RESTORE_FRACTION_END);
+				return DrawableUtils.enlarge(GREEN_SMALL_SIZE, GREEN_DEFAULT_SIZE, t);
 			}
 			return GREEN_DEFAULT_SIZE;
 		}
@@ -170,7 +184,7 @@ public class ThirdLayer extends Layer {
 		}
 	}
 
-	private static final class RedRing extends DrawableShape {
+	private static final class RedRing extends DrawableObjectImpl {
 
 		private static final float SIZE_FRACTION = 0.75f;
 		private static final float START_ANGLE = 0;
@@ -237,7 +251,8 @@ public class ThirdLayer extends Layer {
 				return BLACK_DEFAULT_SIZE;
 			}
 			if (DrawableUtils.between(ddt, SIZE_CHANGE_FRACTION_START, SIZE_CHANGE_FRACTION_END)) {
-				return reduce(BLACK_DEFAULT_SIZE, BLACK_SMALL_SIZE, ddt, SIZE_CHANGE_FRACTION_END, SIZE_CHANGE_FRACTION_END - SIZE_CHANGE_FRACTION_START);
+				float t = DrawableUtils.normalize(ddt, SIZE_CHANGE_FRACTION_START, SIZE_CHANGE_FRACTION_END);
+				return DrawableUtils.reduce(BLACK_DEFAULT_SIZE, BLACK_SMALL_SIZE, t);
 			}
 			return 0;
 		}
@@ -250,7 +265,8 @@ public class ThirdLayer extends Layer {
 				return RED_DEFAULT_SIZE;
 			}
 			if (DrawableUtils.between(ddt, SIZE_CHANGE_FRACTION_START, SIZE_CHANGE_FRACTION_END)) {
-				return reduce(RED_DEFAULT_SIZE, RED_SMALL_SIZE, ddt, SIZE_CHANGE_FRACTION_END, SIZE_CHANGE_FRACTION_END - SIZE_CHANGE_FRACTION_START);
+				float t = DrawableUtils.normalize(ddt, SIZE_CHANGE_FRACTION_START, SIZE_CHANGE_FRACTION_END);
+				return DrawableUtils.reduce(RED_DEFAULT_SIZE, RED_SMALL_SIZE, t);
 			}
 			return 0;
 		}
@@ -266,7 +282,7 @@ public class ThirdLayer extends Layer {
 		}
 	}
 
-	private static final class RedCircle extends DrawableShape {
+	private static final class RedCircle extends DrawableObjectImpl {
 
 		private static final float SIZE_FRACTION = 0.75f;
 		private static final float RED_DEFAULT_SIZE = 0.3f;
@@ -312,7 +328,8 @@ public class ThirdLayer extends Layer {
 
 		private float computeBlackSizeFraction(float ddt) {
 			if (DrawableUtils.between(ddt, BLACK_ENLARGE_FRACTION_START, BLACK_ENLARGE_FRACTION_END)) {
-				return enlarge(BLACK_DEFAULT_SIZE, BLACK_LARGE_SIZE, ddt, BLACK_ENLARGE_FRACTION_END, BLACK_ENLARGE_FRACTION_END - BLACK_ENLARGE_FRACTION_START);
+				float t = DrawableUtils.normalize(ddt, BLACK_ENLARGE_FRACTION_START, BLACK_ENLARGE_FRACTION_END);
+				return DrawableUtils.enlarge(BLACK_DEFAULT_SIZE, BLACK_LARGE_SIZE, t);
 			}
 			if (DrawableUtils.between(ddt, BLACK_ENLARGE_FRACTION_END, VISIBILITY_FRACTION)) {
 				return BLACK_LARGE_SIZE;
@@ -325,13 +342,15 @@ public class ThirdLayer extends Layer {
 				return RED_DEFAULT_SIZE;
 			}
 			if (DrawableUtils.between(ddt, ENLARGE_1_FRACTION_START, ENLARGE_1_FRACTION_END)) {
-				return enlarge(RED_DEFAULT_SIZE, RED_LARGER_SIZE, ddt, ENLARGE_1_FRACTION_END, ENLARGE_1_FRACTION_END - ENLARGE_1_FRACTION_START);
+				float t = DrawableUtils.normalize(ddt, ENLARGE_1_FRACTION_START, ENLARGE_1_FRACTION_END);
+				return DrawableUtils.enlarge(RED_DEFAULT_SIZE, RED_LARGER_SIZE, t);
 			}
 			if (DrawableUtils.between(ddt, ENLARGE_1_FRACTION_END, ENLARGE_2_FRACTION_START)) {
 				return RED_LARGER_SIZE;
 			}
 			if (DrawableUtils.between(ddt, ENLARGE_2_FRACTION_START, ENLARGE_2_FRACTION_END)) {
-				return enlarge(RED_LARGER_SIZE, RED_LARGEST_SIZE, ddt, ENLARGE_2_FRACTION_END, ENLARGE_2_FRACTION_END - ENLARGE_2_FRACTION_START);
+				float t = DrawableUtils.normalize(ddt, ENLARGE_2_FRACTION_START, ENLARGE_2_FRACTION_END);
+				return DrawableUtils.enlarge(RED_LARGER_SIZE, RED_LARGEST_SIZE, t);
 			}
 			if (DrawableUtils.between(ddt, ENLARGE_2_FRACTION_END, VISIBILITY_FRACTION)) {
 				return RED_LARGEST_SIZE;
@@ -340,7 +359,8 @@ public class ThirdLayer extends Layer {
 				return 0;
 			}
 			if (DrawableUtils.between(ddt, ENLARGE_3_FRACTION_START, ENLARGE_3_FRACTION_END)) {
-				return enlarge(0, RED_DEFAULT_SIZE, ddt, ENLARGE_3_FRACTION_END, ENLARGE_3_FRACTION_END - ENLARGE_3_FRACTION_START);
+				float t = DrawableUtils.normalize(ddt, ENLARGE_3_FRACTION_START, ENLARGE_3_FRACTION_END);
+				return DrawableUtils.enlarge(0, RED_DEFAULT_SIZE, t);
 			}
 			return 0;
 		}

@@ -5,15 +5,15 @@ import android.graphics.RectF;
 import android.support.annotation.NonNull;
 
 /**
- * Created by Александр on 15.02.2016.
+ * Implementation of {@link DrawableObject}.
  */
-public abstract class DrawableShape implements DrawableObject {
+abstract class DrawableObjectImpl implements DrawableObject, Resetable {
 
 	private final Paint paint;
 	private final RectF bounds;
 	private long duration;
 
-	public DrawableShape(Paint paint) {
+	public DrawableObjectImpl(Paint paint) {
 		this.paint = paint;
 		this.bounds = new RectF();
 	}
@@ -27,25 +27,16 @@ public abstract class DrawableShape implements DrawableObject {
 		float b = t + getSizeFraction() * bounds.height();
 		getBounds().set(l, t, r, b);
 		this.duration += dt;
-		if (this.duration > Constants.TOTAL_DURATION * Constants.SPEED_COEFFICIENT) {
-			this.duration %= Constants.TOTAL_DURATION * Constants.SPEED_COEFFICIENT;
+		float dur = Constants.TOTAL_DURATION / Constants.SPEED_COEFFICIENT;
+		if (this.duration > dur) {
+			this.duration %= dur;
 		}
-		update(bounds, dt, 1f * duration / (Constants.TOTAL_DURATION  * Constants.SPEED_COEFFICIENT));
+		update(bounds, dt, 1f * duration / dur);
 	}
 
 	protected abstract float getSizeFraction();
 
 	protected abstract void update(@NonNull RectF bounds, long dt, float ddt);
-
-	float enlarge(float startSize, float endSize, float dt, float maxDt, float length) {
-		float t = (1 - (maxDt - dt) / length);
-		return startSize + (endSize - startSize) * t;
-	}
-
-	float reduce(float startSize, float endSize, float value, float max, float length) {
-		float t = (max - value) / length;
-		return endSize + (startSize - endSize) * t;
-	}
 
 	public Paint getPaint() {
 		return paint;
@@ -53,5 +44,10 @@ public abstract class DrawableShape implements DrawableObject {
 
 	public RectF getBounds() {
 		return bounds;
+	}
+
+	@Override
+	public void reset() {
+		duration = 0;
 	}
 }

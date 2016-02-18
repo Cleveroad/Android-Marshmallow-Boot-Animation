@@ -161,13 +161,14 @@ public class LoadingAnimation extends View {
 				continue;
 			layer.reset();
 		}
+		yellowRectangle.reset();
 	}
 
 	public int getState() {
 		return state;
 	}
 
-	private static final class YellowRectangle extends DrawableShape {
+	private static final class YellowRectangle extends DrawableObjectImpl {
 
 
 		private static final float SIZE_FRACTION = 0.6f;
@@ -223,7 +224,8 @@ public class LoadingAnimation extends View {
 				r = cx1 + radius;
 				b = cy1 + radius;
 				if (ddt >= ENLARGE_FRACTION_START) {
-					r = enlarge(r, r + (cx2 - cx1), ddt, ENLARGE_FRACTION_END, ENLARGE_FRACTION_END - ENLARGE_FRACTION_START);
+					float time = DrawableUtils.normalize(ddt, ENLARGE_FRACTION_START, ENLARGE_FRACTION_END);
+					r = DrawableUtils.enlarge(r, r + (cx2 - cx1), time);
 				}
 				rect.set(l, t, r, b);
 			}
@@ -233,7 +235,8 @@ public class LoadingAnimation extends View {
 				t = cy2 - radius;
 				r = cx2 + radius;
 				b = cy2 + radius;
-				l = enlarge(l - (cx2 - cx1), l, ddt, REDUCE_FRACTION_END, REDUCE_FRACTION_END - REDUCE_FRACTION_START);
+				float time = DrawableUtils.normalize(ddt, REDUCE_FRACTION_START, REDUCE_FRACTION_END);
+				l = DrawableUtils.enlarge(l - (cx2 - cx1), l, time);
 				rect.set(l, t, r, b);
 			}
 		}

@@ -6,9 +6,9 @@ import android.graphics.RectF;
 import android.support.annotation.NonNull;
 
 /**
- * Created by Александр on 16.02.2016.
+ * Second layer of animation.
  */
-public class SecondLayer extends Layer {
+class SecondLayer extends Layer {
 
 	private final DrawableObject[] objects;
 
@@ -20,7 +20,7 @@ public class SecondLayer extends Layer {
 	}
 
 	@Override
-	protected void update(@NonNull RectF bounds, long dt, float ddt) {
+	public void update(@NonNull RectF bounds, long dt) {
 		for (DrawableObject object : objects) {
 			object.update(bounds, dt);
 		}
@@ -33,7 +33,16 @@ public class SecondLayer extends Layer {
 		}
 	}
 
-	private static final class RedSunRays extends DrawableShape {
+	@Override
+	public void reset() {
+		for (DrawableObject object : objects) {
+			if (object instanceof Resetable) {
+				((Resetable) object).reset();
+			}
+		}
+	}
+
+	private static final class RedSunRays extends DrawableObjectImpl {
 
 		private static final float ROTATION_FRACTION_START = 54 * Constants.FRAME_SPEED;
 		private static final float ROTATION_FRACTION_END = 88 * Constants.FRAME_SPEED;
@@ -47,11 +56,11 @@ public class SecondLayer extends Layer {
 		private static final float CIRCLES_MOVEMENT_FRACTION_START = 63 * Constants.FRAME_SPEED;
 		private static final float CIRCLES_MOVEMENT_FRACTION_END = 68 * Constants.FRAME_SPEED;
 
-		private static final float CIRCLES_VISIBILITY_FRACTION_START = 60 * Constants.FRAME_SPEED;
-		private static final float CIRCLES_VISIBILITY_FRACTION_END = 62 * Constants.FRAME_SPEED;
+		private static final float CIRCLES_VISIBILITY_FRACTION_START = 59 * Constants.FRAME_SPEED;
+		private static final float CIRCLES_VISIBILITY_FRACTION_END = 63 * Constants.FRAME_SPEED;
 
-		private static final float RAYS_VISIBILITY_1_FRACTION_START = 65 * Constants.FRAME_SPEED;
-		private static final float RAYS_VISIBILITY_1_FRACTION_END = 68 * Constants.FRAME_SPEED;
+		private static final float RAYS_VISIBILITY_1_FRACTION_START = 64 * Constants.FRAME_SPEED;
+		private static final float RAYS_VISIBILITY_1_FRACTION_END = 69 * Constants.FRAME_SPEED;
 
 		private static final float ENLARGE_2_FRACTION_START = 114 * Constants.FRAME_SPEED;
 		private static final float ENLARGE_2_FRACTION_END = 126 * Constants.FRAME_SPEED;
@@ -59,7 +68,7 @@ public class SecondLayer extends Layer {
 		private static final float REDUCE_2_FRACTION_START = 127 * Constants.FRAME_SPEED;
 		private static final float REDUCE_2_FRACTION_END = 137 * Constants.FRAME_SPEED;
 
-		private static final float RAYS_VISIBILITY_2_FRACTION_START = 134 * Constants.FRAME_SPEED;
+		private static final float RAYS_VISIBILITY_2_FRACTION_START = 132 * Constants.FRAME_SPEED;
 		private static final float RAYS_VISIBILITY_2_FRACTION_END = 136 * Constants.FRAME_SPEED;
 
 		private static final float SWAP_FRACTION = 90 * Constants.FRAME_SPEED;
@@ -101,8 +110,13 @@ public class SecondLayer extends Layer {
 				angle = t * END_ANGLE;
 			}
 
+			if (ddt >= SWAP_FRACTION) {
+				getPaint().setAlpha(255);
+				dotsPaint.setAlpha(0);
+			}
+
 			float width = getBounds().width() * 0.07f;
-			float height = getBounds().width() * 0.24f;
+			float height = getBounds().width() * 0.28f;
 			float halfSize = width / 2f;
 			float cx = getBounds().centerX();
 
@@ -111,7 +125,8 @@ public class SecondLayer extends Layer {
 				l = cx - halfSize;
 				r = cx + halfSize;
 				b = getBounds().top + height;
-				t = b - enlarge(width, height, ddt, ENLARGE_1_FRACTION_END, ENLARGE_1_FRACTION_END - ENLARGE_1_FRACTION_START);
+				float time = DrawableUtils.normalize(ddt, ENLARGE_1_FRACTION_START, ENLARGE_1_FRACTION_END);
+				t = b - DrawableUtils.enlarge(width, height, time);
 				rect.set(l, t, r, b);
 			}
 			if (DrawableUtils.between(ddt, REDUCE_1_FRACTION_START, REDUCE_1_FRACTION_END)) {
@@ -119,7 +134,8 @@ public class SecondLayer extends Layer {
 				l = cx - halfSize;
 				r = cx + halfSize;
 				t = getBounds().top;
-				b = t + reduce(height, width, ddt, REDUCE_1_FRACTION_END, REDUCE_1_FRACTION_END - REDUCE_1_FRACTION_START);
+				float time = DrawableUtils.normalize(ddt, REDUCE_1_FRACTION_START, REDUCE_1_FRACTION_END);
+				b = t + DrawableUtils.reduce(height, width, time);
 				rect.set(l, t, r, b);
 			}
 
@@ -128,7 +144,8 @@ public class SecondLayer extends Layer {
 				l = cx - halfSize;
 				r = cx + halfSize;
 				t = getBounds().top;
-				b = t + enlarge(width, height, ddt, ENLARGE_2_FRACTION_END, ENLARGE_2_FRACTION_END - ENLARGE_2_FRACTION_START);
+				float time = DrawableUtils.normalize(ddt, ENLARGE_2_FRACTION_START, ENLARGE_2_FRACTION_END);
+				b = t + DrawableUtils.enlarge(width, height, time);
 				rect.set(l, t, r, b);
 			}
 			if (DrawableUtils.between(ddt, REDUCE_2_FRACTION_START, REDUCE_2_FRACTION_END)) {
@@ -136,7 +153,8 @@ public class SecondLayer extends Layer {
 				l = cx - halfSize;
 				r = cx + halfSize;
 				b = getBounds().top + height;
-				t = b - reduce(height, width, ddt, REDUCE_2_FRACTION_END, REDUCE_2_FRACTION_END - REDUCE_2_FRACTION_START);
+				float time = DrawableUtils.normalize(ddt, REDUCE_2_FRACTION_START, REDUCE_2_FRACTION_END);
+				t = b - DrawableUtils.reduce(height, width, time);
 				rect.set(l, t, r, b);
 			}
 
@@ -150,12 +168,13 @@ public class SecondLayer extends Layer {
 				dotSize = 0;
 			}
 
-			if (DrawableUtils.between(ddt, CIRCLES_MOVEMENT_FRACTION_START, CIRCLES_VISIBILITY_FRACTION_END)) {
-				float t = DrawableUtils.normalize(ddt, CIRCLES_MOVEMENT_FRACTION_START, CIRCLES_VISIBILITY_FRACTION_END);
+			if (DrawableUtils.between(ddt, CIRCLES_VISIBILITY_FRACTION_START, CIRCLES_VISIBILITY_FRACTION_END)) {
+				float t = DrawableUtils.normalize(ddt, CIRCLES_VISIBILITY_FRACTION_START, CIRCLES_VISIBILITY_FRACTION_END);
 				dotsPaint.setAlpha((int) (t * 255));
 			}
 			if (DrawableUtils.between(ddt, CIRCLES_MOVEMENT_FRACTION_START, CIRCLES_MOVEMENT_FRACTION_END)) {
-				dotCy = reduce(startPoint, getBounds().top + halfSize, ddt, CIRCLES_MOVEMENT_FRACTION_END, CIRCLES_MOVEMENT_FRACTION_END - CIRCLES_MOVEMENT_FRACTION_START);
+				float t = DrawableUtils.normalize(ddt, CIRCLES_MOVEMENT_FRACTION_START, CIRCLES_MOVEMENT_FRACTION_END);
+				dotCy = DrawableUtils.reduce(startPoint, getBounds().top + halfSize, t);
 				dotsPaint.setAlpha(255);
 			}
 
@@ -168,11 +187,6 @@ public class SecondLayer extends Layer {
 			if (DrawableUtils.between(ddt, RAYS_VISIBILITY_2_FRACTION_START, RAYS_VISIBILITY_2_FRACTION_END)) {
 				float t = DrawableUtils.normalize(ddt, RAYS_VISIBILITY_2_FRACTION_START, RAYS_VISIBILITY_2_FRACTION_END);
 				getPaint().setAlpha((int) ((1 - t) * 255));
-			}
-
-			if (ddt >= SWAP_FRACTION) {
-				getPaint().setAlpha(255);
-				dotsPaint.setAlpha(0);
 			}
 		}
 
@@ -196,7 +210,7 @@ public class SecondLayer extends Layer {
 		}
 	}
 
-	private static final class YellowCircleInner extends DrawableShape {
+	private static final class YellowCircleInner extends DrawableObjectImpl {
 
 		private static final float ENLARGE_FRACTION_START = 65 * Constants.FRAME_SPEED;
 		private static final float ENLARGE_FRACTION_END = 72 * Constants.FRAME_SPEED;
@@ -207,6 +221,9 @@ public class SecondLayer extends Layer {
 		private static final float MORE_REDUCE_FRACTION_START = 110 * Constants.FRAME_SPEED;
 		private static final float MORE_REDUCE_FRACTION_END = 121 * Constants.FRAME_SPEED;
 
+		private static final float DEFAULT_SIZE = 0.5f;
+		private static final float LARGER_SIZE = 0.65f;
+		private static final float LARGEST_SIZE = 0.8f;
 
 		private static final float SIZE_FRACTION = 0.6f;
 
@@ -228,19 +245,22 @@ public class SecondLayer extends Layer {
 
 		private float getSizeFraction(float ddt) {
 			if (DrawableUtils.between(ddt, ENLARGE_FRACTION_START, ENLARGE_FRACTION_END)) {
-				return enlarge(0.5f, 0.65f, ddt, ENLARGE_FRACTION_END, ENLARGE_FRACTION_END - ENLARGE_FRACTION_START);
+				float t = DrawableUtils.normalize(ddt, ENLARGE_FRACTION_START, ENLARGE_FRACTION_END);
+				return DrawableUtils.enlarge(DEFAULT_SIZE, LARGER_SIZE, t);
 			}
 			if (DrawableUtils.between(ddt, ENLARGE_FRACTION_END, MORE_ENLARGE_FRACTION_START)) {
-				return 0.65f;
+				return LARGER_SIZE;
 			}
 			if (DrawableUtils.between(ddt, MORE_ENLARGE_FRACTION_START, MORE_ENLARGE_FRACTION_END)) {
-				return enlarge(0.65f, 0.8f, ddt, MORE_ENLARGE_FRACTION_END, MORE_ENLARGE_FRACTION_END - MORE_ENLARGE_FRACTION_START);
+				float t = DrawableUtils.normalize(ddt, MORE_ENLARGE_FRACTION_START, MORE_ENLARGE_FRACTION_END);
+				return DrawableUtils.enlarge(LARGER_SIZE, LARGEST_SIZE, t);
 			}
 			if (DrawableUtils.between(ddt, MORE_ENLARGE_FRACTION_END, MORE_REDUCE_FRACTION_START)) {
-				return 0.8f;
+				return LARGEST_SIZE;
 			}
 			if (DrawableUtils.between(ddt, MORE_REDUCE_FRACTION_START, MORE_REDUCE_FRACTION_END)) {
-				return reduce(0.8f, 0.5f, ddt, MORE_REDUCE_FRACTION_END, MORE_REDUCE_FRACTION_END - MORE_REDUCE_FRACTION_START);
+				float t = DrawableUtils.normalize(ddt, MORE_REDUCE_FRACTION_START, MORE_REDUCE_FRACTION_END);
+				return DrawableUtils.reduce(LARGEST_SIZE, DEFAULT_SIZE, t);
 			}
 			return 0;
 		}
@@ -255,7 +275,7 @@ public class SecondLayer extends Layer {
 		}
 	}
 
-	private static final class RedRing extends DrawableShape {
+	private static final class RedRing extends DrawableObjectImpl {
 
 		private static final float FRACTION_START = Constants.FIRST_FRAME_FRACTION;
 
@@ -320,13 +340,15 @@ public class SecondLayer extends Layer {
 				return RED_DEFAULT_SIZE;
 			}
 			if (DrawableUtils.between(ddt, RED_REDUCE_FRACTION_START, RED_REDUCE_FRACTION_END)) {
-				return reduce(RED_DEFAULT_SIZE, RED_SMALL_SIZE, ddt, RED_REDUCE_FRACTION_END, RED_REDUCE_FRACTION_END - RED_REDUCE_FRACTION_START);
+				float t = DrawableUtils.normalize(ddt, RED_REDUCE_FRACTION_START, RED_REDUCE_FRACTION_END);
+				return DrawableUtils.reduce(RED_DEFAULT_SIZE, RED_SMALL_SIZE, t);
 			}
 			if (DrawableUtils.between(ddt, RED_REDUCE_FRACTION_END, RED_ENLARGE_FRACTION_START)) {
 				return RED_SMALL_SIZE;
 			}
 			if (DrawableUtils.between(ddt, RED_ENLARGE_FRACTION_START, RED_ENLARGE_FRACTION_END)) {
-				return enlarge(RED_SMALL_SIZE, RED_DEFAULT_SIZE, ddt, RED_ENLARGE_FRACTION_END, RED_ENLARGE_FRACTION_END - RED_ENLARGE_FRACTION_START);
+				float t = DrawableUtils.normalize(ddt, RED_ENLARGE_FRACTION_START, RED_ENLARGE_FRACTION_END);
+				return DrawableUtils.enlarge(RED_SMALL_SIZE, RED_DEFAULT_SIZE, t);
 			}
 			return RED_DEFAULT_SIZE;
 		}
@@ -339,7 +361,8 @@ public class SecondLayer extends Layer {
 				return BLACK_SMALL_SIZE;
 			}
 			if (DrawableUtils.between(ddt, BLACK_RESTORE_FRACTION_START, BLACK_RESTORE_FRACTION_END)) {
-				return enlarge(BLACK_SMALL_SIZE, BLACK_DEFAULT_SIZE, ddt, BLACK_RESTORE_FRACTION_END, BLACK_RESTORE_FRACTION_END - BLACK_RESTORE_FRACTION_START);
+				float t = DrawableUtils.normalize(ddt, BLACK_RESTORE_FRACTION_START, BLACK_RESTORE_FRACTION_END);
+				return DrawableUtils.enlarge(BLACK_SMALL_SIZE, BLACK_DEFAULT_SIZE, t);
 			}
 			return ZERO_SIZE;
 		}
@@ -349,25 +372,29 @@ public class SecondLayer extends Layer {
 				return YELLOW_DEFAULT_SIZE;
 			}
 			if (DrawableUtils.between(ddt, YELLOW_ENLARGE_FRACTION_START, YELLOW_ENLARGE_FRACTION_END)) {
-				return enlarge(YELLOW_DEFAULT_SIZE, YELLOW_LARGE_SIZE, ddt, YELLOW_ENLARGE_FRACTION_END, YELLOW_ENLARGE_FRACTION_END - YELLOW_ENLARGE_FRACTION_START);
+				float t = DrawableUtils.normalize(ddt, YELLOW_ENLARGE_FRACTION_START, YELLOW_ENLARGE_FRACTION_END);
+				return DrawableUtils.enlarge(YELLOW_DEFAULT_SIZE, YELLOW_LARGE_SIZE, t);
 			}
 			if (DrawableUtils.between(ddt, YELLOW_ENLARGE_FRACTION_END, YELLOW_MEDIUM_ENLARGE_FRACTION_START)) {
 				return ZERO_SIZE;
 			}
 			if (DrawableUtils.between(ddt, YELLOW_MEDIUM_ENLARGE_FRACTION_START, YELLOW_MEDIUM_ENLARGE_FRACTION_END)) {
-				return enlarge(ZERO_SIZE, YELLOW_DEFAULT_SIZE, ddt, YELLOW_MEDIUM_ENLARGE_FRACTION_END, YELLOW_MEDIUM_ENLARGE_FRACTION_END - YELLOW_MEDIUM_ENLARGE_FRACTION_START);
+				float t = DrawableUtils.normalize(ddt, YELLOW_MEDIUM_ENLARGE_FRACTION_START, YELLOW_MEDIUM_ENLARGE_FRACTION_END);
+				return DrawableUtils.enlarge(ZERO_SIZE, YELLOW_DEFAULT_SIZE, t);
 			}
 			if (DrawableUtils.between(ddt, YELLOW_MEDIUM_ENLARGE_FRACTION_END, YELLOW_MEDIUM_REDUCE_FRACTION_START)) {
 				return YELLOW_DEFAULT_SIZE;
 			}
 			if (DrawableUtils.between(ddt, YELLOW_MEDIUM_REDUCE_FRACTION_START, YELLOW_MEDIUM_REDUCE_FRACTION_END)) {
-				return reduce(YELLOW_DEFAULT_SIZE, ZERO_SIZE, ddt, YELLOW_MEDIUM_REDUCE_FRACTION_END, YELLOW_MEDIUM_REDUCE_FRACTION_END - YELLOW_MEDIUM_REDUCE_FRACTION_START);
+				float t = DrawableUtils.normalize(ddt, YELLOW_MEDIUM_REDUCE_FRACTION_START, YELLOW_MEDIUM_REDUCE_FRACTION_END);
+				return DrawableUtils.reduce(YELLOW_DEFAULT_SIZE, ZERO_SIZE, t);
 			}
 			if (DrawableUtils.between(ddt, YELLOW_MEDIUM_REDUCE_FRACTION_END, YELLOW_RESTORE_FRACTION_START)) {
 				return ZERO_SIZE;
 			}
 			if (DrawableUtils.between(ddt, YELLOW_RESTORE_FRACTION_START, YELLOW_RESTORE_FRACTION_END)) {
-				return enlarge(ZERO_SIZE, YELLOW_DEFAULT_SIZE, ddt, YELLOW_RESTORE_FRACTION_END, YELLOW_RESTORE_FRACTION_END - YELLOW_RESTORE_FRACTION_START);
+				float t = DrawableUtils.normalize(ddt, YELLOW_RESTORE_FRACTION_START, YELLOW_RESTORE_FRACTION_END);
+				return DrawableUtils.enlarge(ZERO_SIZE, YELLOW_DEFAULT_SIZE, t);
 			}
 			return ZERO_SIZE;
 		}
