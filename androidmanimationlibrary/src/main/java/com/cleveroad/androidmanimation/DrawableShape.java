@@ -27,10 +27,10 @@ public abstract class DrawableShape implements DrawableObject {
 		float b = t + getSizeFraction() * bounds.height();
 		getBounds().set(l, t, r, b);
 		this.duration += dt;
-		if (this.duration > Constants.TOTAL_DURATION) {
-			this.duration %= Constants.TOTAL_DURATION;
+		if (this.duration > Constants.TOTAL_DURATION * Constants.SPEED_COEFFICIENT) {
+			this.duration %= Constants.TOTAL_DURATION * Constants.SPEED_COEFFICIENT;
 		}
-		update(bounds, dt, 1f * duration / Constants.TOTAL_DURATION);
+		update(bounds, dt, 1f * duration / (Constants.TOTAL_DURATION  * Constants.SPEED_COEFFICIENT));
 	}
 
 	protected abstract float getSizeFraction();

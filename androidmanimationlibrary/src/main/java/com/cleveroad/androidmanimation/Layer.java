@@ -18,10 +18,10 @@ public abstract class Layer implements DrawableObject {
 	public final void update(@NonNull RectF bounds, long dt) {
 		this.bounds.set(bounds);
 		this.duration += dt;
-		if (this.duration > Constants.TOTAL_DURATION) {
-			this.duration %= Constants.TOTAL_DURATION;
+		if (this.duration > Constants.TOTAL_DURATION * Constants.SPEED_COEFFICIENT) {
+			this.duration %= Constants.TOTAL_DURATION * Constants.SPEED_COEFFICIENT;
 		}
-		update(bounds, dt, 1f * duration / Constants.TOTAL_DURATION);
+		update(bounds, dt, 1f * duration / (Constants.TOTAL_DURATION * Constants.SPEED_COEFFICIENT));
 	}
 
 	protected abstract void update(@NonNull RectF bounds, long dt, float ddt);

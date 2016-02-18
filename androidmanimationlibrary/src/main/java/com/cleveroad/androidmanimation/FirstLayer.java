@@ -114,7 +114,7 @@ public class FirstLayer extends Layer {
 		public void draw(@NonNull Canvas canvas) {
 			for (int i = 0; i < CIRCLES_COUNT; i++) {
 				if (sizes[i] > 0) {
-					canvas.drawCircle(circlePositions[i][0], circlePositions[i][1], getBounds().width() * 0.08f * sizes[i], getPaint());
+					canvas.drawCircle(circlePositions[i][0], circlePositions[i][1], getBounds().width() * 0.07f * sizes[i], getPaint());
 				}
 			}
 		}
@@ -149,7 +149,7 @@ public class FirstLayer extends Layer {
 
 		@Override
 		protected void update(@NonNull RectF bounds, long dt, float ddt) {
-			getPaint().setStrokeWidth(bounds.width() * 0.1f);
+			getPaint().setStrokeWidth(bounds.width() * 0.08f);
 			draw = DrawableUtils.between(ddt, FRACTION_START, FRACTION_END);
 			if (!draw) {
 				startAngle = START_ANGLE;

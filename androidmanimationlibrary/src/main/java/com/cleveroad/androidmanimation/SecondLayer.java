@@ -4,23 +4,11 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
-import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.Interpolator;
 
 /**
  * Created by Александр on 16.02.2016.
  */
 public class SecondLayer extends Layer {
-
-	private static final long SIZE_ANIMATION_DURATION = 200 * Constants.SPEED_COEFFICIENT;
-	private static final long IDLE_1_DURATION = 2100 * Constants.SPEED_COEFFICIENT;
-	private static final long LONG_ANIMATION_DURATION = 600 * Constants.SPEED_COEFFICIENT;
-	private static final long ROTATION_DELAY_DURATION = 100 * Constants.SPEED_COEFFICIENT;
-
-	private static final float SIZE_ANIMATION_FRACTION = 1f * SIZE_ANIMATION_DURATION / Constants.TOTAL_DURATION;
-	private static final float IDLE_1_FRACTION = 1f * IDLE_1_DURATION / Constants.TOTAL_DURATION;
-	private static final float LONG_ANIMATION_FRACTION = 1f * LONG_ANIMATION_DURATION / Constants.TOTAL_DURATION;
-	private static final float ROTATION_DELAY_FRACTION = 1f * ROTATION_DELAY_DURATION / Constants.TOTAL_DURATION;
 
 	private final DrawableObject[] objects;
 
@@ -83,7 +71,6 @@ public class SecondLayer extends Layer {
 
 		private final Paint dotsPaint;
 		private final RectF rect;
-		private final Interpolator interpolator;
 		private float angle;
 		private boolean draw;
 		private float dotSize;
@@ -93,7 +80,6 @@ public class SecondLayer extends Layer {
 			super(new Paint(paint));
 			this.dotsPaint = new Paint(paint);
 			this.rect = new RectF();
-			this.interpolator = new AccelerateDecelerateInterpolator();
 		}
 
 		@Override
