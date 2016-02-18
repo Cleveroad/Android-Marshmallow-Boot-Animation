@@ -260,7 +260,7 @@ public class SecondLayer extends Layer {
 		private static final float FRACTION_START = Constants.FIRST_FRAME_FRACTION;
 
 		private static final float YELLOW_ENLARGE_FRACTION_START = 7 * Constants.FRAME_SPEED;
-		private static final float YELLOW_ENLARGE_FRACTION_END = 19 * Constants.FRAME_SPEED;
+		private static final float YELLOW_ENLARGE_FRACTION_END = 16.5f * Constants.FRAME_SPEED;
 		private static final float YELLOW_MEDIUM_ENLARGE_FRACTION_START = 52 * Constants.FRAME_SPEED;
 		private static final float YELLOW_MEDIUM_ENLARGE_FRACTION_END = 62 * Constants.FRAME_SPEED;
 		private static final float YELLOW_MEDIUM_REDUCE_FRACTION_START = 131 * Constants.FRAME_SPEED;
@@ -281,7 +281,7 @@ public class SecondLayer extends Layer {
 		private static final float SIZE_FRACTION = 0.6f;
 
 		private static final float YELLOW_DEFAULT_SIZE = 0.25f;
-		private static final float YELLOW_LARGE_SIZE = 1.1f;
+		private static final float YELLOW_LARGE_SIZE = 1f;
 
 		private static final float BLACK_DEFAULT_SIZE = 0.5f;
 		private static final float BLACK_SMALL_SIZE = 0.1f;

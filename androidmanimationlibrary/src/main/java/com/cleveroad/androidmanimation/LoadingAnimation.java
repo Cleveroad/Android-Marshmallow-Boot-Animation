@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -25,6 +26,7 @@ public class LoadingAnimation extends View {
 	private static final int LAYERS_COUNT = 4;
 
 	private final Layer[] layers = new Layer[LAYERS_COUNT];
+	private YellowRectangle yellowRectangle;
 	private final RectF bounds = new RectF();
 
 	private int state = STATE_STOPPED;
@@ -69,6 +71,7 @@ public class LoadingAnimation extends View {
 		layers[1] = new SecondLayer(redPaint, yellowPaint, bgPaint);
 		layers[2] = new ThirdLayer(redPaint, greenPaint, bgPaint);
 		layers[3] = new FourthLayer(redPaint, greenPaint, bluePaint, yellowPaint);
+		yellowRectangle = new YellowRectangle(yellowPaint);
 	}
 
 	@Override
@@ -103,7 +106,15 @@ public class LoadingAnimation extends View {
 			bounds.set(l, t, r, b);
 			layers[i].update(bounds, dt);
 			layers[i].draw(canvas);
+			if (i == 1) {
+				yellowRectangle.setFirstValues(bounds.centerX(), bounds.centerY());
+			} else if (i == 2) {
+				yellowRectangle.setSecondValues(bounds.centerX(), bounds.centerY());
+				yellowRectangle.updateRadius(bounds.height());
+			}
 		}
+		yellowRectangle.update(bounds, dt);
+		yellowRectangle.draw(canvas);
 	}
 
 	public void startAnimation() {
@@ -154,5 +165,84 @@ public class LoadingAnimation extends View {
 
 	public int getState() {
 		return state;
+	}
+
+	private static final class YellowRectangle extends DrawableShape {
+
+
+		private static final float SIZE_FRACTION = 0.6f;
+
+		private static final float VISIBILITY_FRACTION_START = 16 * Constants.FRAME_SPEED;
+		private static final float VISIBILITY_FRACTION_END = 58 * Constants.FRAME_SPEED;
+
+		private static final float ENLARGE_FRACTION_START = 19 * Constants.FRAME_SPEED;
+		private static final float ENLARGE_FRACTION_END = 36 * Constants.FRAME_SPEED;
+		private static final float REDUCE_FRACTION_START = 36 * Constants.FRAME_SPEED;
+		private static final float REDUCE_FRACTION_END = 56 * Constants.FRAME_SPEED;
+
+		private float cx1, cy1, cx2, cy2;
+		private RectF rect;
+		private boolean draw;
+		private float radius;
+
+		public YellowRectangle(Paint paint) {
+			super(paint);
+			this.rect = new RectF();
+		}
+
+		@Override
+		protected float getSizeFraction() {
+			return SIZE_FRACTION;
+		}
+
+		private void setFirstValues(float cx1, float cy1) {
+			this.cx1 = cx1;
+			this.cy1 = cy1;
+		}
+
+		private void setSecondValues(float cx2, float cy2) {
+			this.cx2 = cx2;
+			this.cy2 = cy2;
+		}
+
+		public YellowRectangle updateRadius(float size) {
+			this.radius = size * SIZE_FRACTION / 2f;
+			return this;
+		}
+
+		@Override
+		protected void update(@NonNull RectF bounds, long dt, float ddt) {
+			draw = DrawableUtils.between(ddt, VISIBILITY_FRACTION_START, VISIBILITY_FRACTION_END);
+			if (!draw) {
+				return;
+			}
+			if (DrawableUtils.between(ddt, VISIBILITY_FRACTION_START, ENLARGE_FRACTION_END)) {
+				float l,r,t,b;
+				l = cx1 - radius;
+				t = cy1 - radius;
+				r = cx1 + radius;
+				b = cy1 + radius;
+				if (ddt >= ENLARGE_FRACTION_START) {
+					r = enlarge(r, r + (cx2 - cx1), ddt, ENLARGE_FRACTION_END, ENLARGE_FRACTION_END - ENLARGE_FRACTION_START);
+				}
+				rect.set(l, t, r, b);
+			}
+			if (DrawableUtils.between(ddt, REDUCE_FRACTION_START, REDUCE_FRACTION_END)) {
+				float l,r,t,b;
+				l = cx2 - radius;
+				t = cy2 - radius;
+				r = cx2 + radius;
+				b = cy2 + radius;
+				l = enlarge(l - (cx2 - cx1), l, ddt, REDUCE_FRACTION_END, REDUCE_FRACTION_END - REDUCE_FRACTION_START);
+				rect.set(l, t, r, b);
+			}
+		}
+
+		@Override
+		public void draw(@NonNull Canvas canvas) {
+			if (draw) {
+				canvas.drawRoundRect(rect, radius, radius, getPaint());
+			}
+		}
 	}
 }
