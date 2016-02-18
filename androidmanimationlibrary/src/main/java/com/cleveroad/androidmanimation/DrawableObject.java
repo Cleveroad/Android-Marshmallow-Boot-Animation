@@ -5,9 +5,9 @@ import android.graphics.RectF;
 import android.support.annotation.NonNull;
 
 /**
- * Created by Александр on 15.02.2016.
+ * Interface of drawable shape
  */
-public interface DrawableObject {
+interface DrawableObject {
 
 	void update(@NonNull RectF bounds, long dt);
 

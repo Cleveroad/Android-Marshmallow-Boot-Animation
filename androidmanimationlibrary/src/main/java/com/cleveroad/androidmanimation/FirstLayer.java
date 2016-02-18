@@ -8,9 +8,9 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Interpolator;
 
 /**
- * Created by Александр on 15.02.2016.
+ * First layer of animation.
  */
-public class FirstLayer extends Layer {
+class FirstLayer extends Layer {
 
 
 	private final DrawableObject[] objects;
@@ -24,7 +24,7 @@ public class FirstLayer extends Layer {
 	}
 
 	@Override
-	protected void update(@NonNull RectF bounds, long dt, float ddt) {
+	public void update(@NonNull RectF bounds, long dt) {
 		for (DrawableObject object : objects) {
 			object.update(bounds, dt);
 		}
@@ -37,9 +37,18 @@ public class FirstLayer extends Layer {
 		}
 	}
 
-	private static final class GreenCircles extends DrawableShape {
+	@Override
+	public void reset() {
+		for (DrawableObject object : objects) {
+			if (object instanceof Resetable) {
+				((Resetable) object).reset();
+			}
+		}
+	}
 
-		private static final float FRACTION_START = 0;
+	private static final class GreenCircles extends DrawableObjectImpl {
+
+		private static final float FRACTION_START = Constants.FIRST_FRAME_FRACTION;
 		private static final float FRACTION_END = 50 * Constants.FRAME_SPEED;
 
 		private static final float SIZE_FRACTION = 0.75f;
@@ -114,13 +123,13 @@ public class FirstLayer extends Layer {
 		public void draw(@NonNull Canvas canvas) {
 			for (int i = 0; i < CIRCLES_COUNT; i++) {
 				if (sizes[i] > 0) {
-					canvas.drawCircle(circlePositions[i][0], circlePositions[i][1], getBounds().width() * 0.08f * sizes[i], getPaint());
+					canvas.drawCircle(circlePositions[i][0], circlePositions[i][1], getBounds().width() * 0.07f * sizes[i], getPaint());
 				}
 			}
 		}
 	}
 
-	private static final class BlueArc extends DrawableShape {
+	private static final class BlueArc extends DrawableObjectImpl {
 
 		private static final float FRACTION_START = 77 * Constants.FRAME_SPEED;
 		private static final float FRACTION_END = 132 * Constants.FRAME_SPEED;
@@ -149,7 +158,7 @@ public class FirstLayer extends Layer {
 
 		@Override
 		protected void update(@NonNull RectF bounds, long dt, float ddt) {
-			getPaint().setStrokeWidth(bounds.width() * 0.1f);
+			getPaint().setStrokeWidth(bounds.width() * 0.08f);
 			draw = DrawableUtils.between(ddt, FRACTION_START, FRACTION_END);
 			if (!draw) {
 				startAngle = START_ANGLE;
@@ -168,7 +177,7 @@ public class FirstLayer extends Layer {
 		}
 	}
 
-	private static final class YellowCircle extends DrawableShape {
+	private static final class YellowCircle extends DrawableObjectImpl {
 
 		private static final float BLACK_REDUCE_FRACTION_START = 50 * Constants.FRAME_SPEED;
 		private static final float BLACK_REDUCE_FRACTION_END = 64 * Constants.FRAME_SPEED;
@@ -207,20 +216,23 @@ public class FirstLayer extends Layer {
 
 		private float computeBlackSizeFraction(float ddt) {
 			if (DrawableUtils.between(ddt, BLACK_REDUCE_FRACTION_START, BLACK_REDUCE_FRACTION_END)) {
-				return reduce(LARGE_SIZE * 0.9f, BLACK_INVISIBLE_SIZE, ddt, BLACK_REDUCE_FRACTION_END, BLACK_REDUCE_FRACTION_END - BLACK_REDUCE_FRACTION_START);
+				float t = DrawableUtils.normalize(ddt, BLACK_REDUCE_FRACTION_START, BLACK_REDUCE_FRACTION_END);
+				return DrawableUtils.reduce(LARGE_SIZE * 0.9f, BLACK_INVISIBLE_SIZE, t);
 			}
 			return ZERO_SIZE;
 		}
 
 		private float computeYellowSizeFraction(float ddt) {
 			if (DrawableUtils.between(ddt, BLACK_REDUCE_FRACTION_START, BLACK_REDUCE_FRACTION_END)) {
-				return reduce(LARGE_SIZE, BLACK_INVISIBLE_SIZE * 1.4f, ddt, BLACK_REDUCE_FRACTION_END, BLACK_REDUCE_FRACTION_END - BLACK_REDUCE_FRACTION_START);
+				float t = DrawableUtils.normalize(ddt, BLACK_REDUCE_FRACTION_START, BLACK_REDUCE_FRACTION_END);
+				return DrawableUtils.reduce(LARGE_SIZE, BLACK_INVISIBLE_SIZE * 1.4f, t);
 			}
 			if (DrawableUtils.between(ddt, BLACK_REDUCE_FRACTION_END, YELLOW_REDUCE_FRACTION_START)) {
 				return BLACK_INVISIBLE_SIZE * 1.4f;
 			}
 			if (DrawableUtils.between(ddt, YELLOW_REDUCE_FRACTION_START, YELLOW_REDUCE_FRACTION_END)) {
-				return reduce(BLACK_INVISIBLE_SIZE * 1.4f, SMALL_SIZE, ddt, YELLOW_REDUCE_FRACTION_END, YELLOW_REDUCE_FRACTION_END - YELLOW_REDUCE_FRACTION_START);
+				float t = DrawableUtils.normalize(ddt, YELLOW_REDUCE_FRACTION_START, YELLOW_REDUCE_FRACTION_END);
+				return DrawableUtils.reduce(BLACK_INVISIBLE_SIZE * 1.4f, SMALL_SIZE, t);
 			}
 			if (DrawableUtils.between(ddt, YELLOW_REDUCE_FRACTION_END, YELLOW_INVISIBLE_FRACTION_START)) {
 				return SMALL_SIZE;
@@ -239,9 +251,9 @@ public class FirstLayer extends Layer {
 		}
 	}
 
-	private static final class BlueCircle extends DrawableShape {
+	private static final class BlueCircle extends DrawableObjectImpl {
 
-		private static final float SMALL_REDUCE_FRACTION_START = 0;
+		private static final float SMALL_REDUCE_FRACTION_START = Constants.FIRST_FRAME_FRACTION;
 		private static final float SMALL_REDUCE_FRACTION_END = 12 * Constants.FRAME_SPEED;
 
 		private static final float SMALL_ENLARGE_FRACTION_START = 44 * Constants.FRAME_SPEED;
@@ -251,7 +263,7 @@ public class FirstLayer extends Layer {
 		private static final float LARGE_REDUCE_FRACTION_END = 80 * Constants.FRAME_SPEED;
 
 		private static final float LARGE_ENLARGE_FRACTION_START = 133 * Constants.FRAME_SPEED;
-		private static final float LARGE_ENLARGE_FRACTION_END = 151 * Constants.FRAME_SPEED;
+		private static final float LARGE_ENLARGE_FRACTION_END = Constants.LAST_FRAME_FRACTION;
 
 
 		private static final float SIZE_FRACTION = 0.6f;
@@ -284,25 +296,29 @@ public class FirstLayer extends Layer {
 
 		private float computeSizeFraction(float ddt) {
 			if (DrawableUtils.between(ddt, SMALL_REDUCE_FRACTION_START, SMALL_REDUCE_FRACTION_END)) {
-				return reduce(LARGE_SIZE, DEFAULT_SIZE, ddt, SMALL_REDUCE_FRACTION_END, SMALL_REDUCE_FRACTION_END - SMALL_REDUCE_FRACTION_START);
+				float t = DrawableUtils.normalize(ddt, SMALL_REDUCE_FRACTION_START, SMALL_REDUCE_FRACTION_END);
+				return DrawableUtils.reduce(LARGE_SIZE, DEFAULT_SIZE, t);
 			}
 			if (DrawableUtils.between(ddt, SMALL_REDUCE_FRACTION_END, SMALL_ENLARGE_FRACTION_START)) {
 				return DEFAULT_SIZE;
 			}
 			if (DrawableUtils.between(ddt, SMALL_ENLARGE_FRACTION_START, SMALL_ENLARGE_FRACTION_END)) {
-				return enlarge(DEFAULT_SIZE, LARGE_SIZE, ddt, SMALL_ENLARGE_FRACTION_END, SMALL_ENLARGE_FRACTION_END - SMALL_ENLARGE_FRACTION_START);
+				float t = DrawableUtils.normalize(ddt, SMALL_ENLARGE_FRACTION_START, SMALL_ENLARGE_FRACTION_END);
+				return DrawableUtils.enlarge(DEFAULT_SIZE, LARGE_SIZE, t);
 			}
 			if (DrawableUtils.between(ddt, SMALL_ENLARGE_FRACTION_END, LARGE_REDUCE_FRACTION_START)) {
 				return LARGE_SIZE;
 			}
 			if (DrawableUtils.between(ddt, LARGE_REDUCE_FRACTION_START, LARGE_REDUCE_FRACTION_END)) {
-				return reduce(LARGE_SIZE, ZERO_SIZE, ddt, LARGE_REDUCE_FRACTION_END, LARGE_REDUCE_FRACTION_END - LARGE_REDUCE_FRACTION_START);
+				float t = DrawableUtils.normalize(ddt, LARGE_REDUCE_FRACTION_START, LARGE_REDUCE_FRACTION_END);
+				return DrawableUtils.reduce(LARGE_SIZE, ZERO_SIZE, t);
 			}
 			if (DrawableUtils.between(ddt, LARGE_REDUCE_FRACTION_END, LARGE_ENLARGE_FRACTION_START)) {
 				return ZERO_SIZE;
 			}
 			if (DrawableUtils.between(ddt, LARGE_ENLARGE_FRACTION_START, LARGE_ENLARGE_FRACTION_END)) {
-				return enlarge(ZERO_SIZE, LARGE_SIZE, ddt, LARGE_ENLARGE_FRACTION_END, LARGE_ENLARGE_FRACTION_END - LARGE_ENLARGE_FRACTION_START);
+				float t = DrawableUtils.normalize(ddt, LARGE_ENLARGE_FRACTION_START, LARGE_ENLARGE_FRACTION_END);
+				return DrawableUtils.enlarge(ZERO_SIZE, LARGE_SIZE, t);
 			}
 
 			// default value

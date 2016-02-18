@@ -6,7 +6,7 @@ import android.graphics.RectF;
 import android.support.annotation.NonNull;
 
 /**
- * Created by Александр on 16.02.2016.
+ * Fourth layer of animation.
  */
 public class FourthLayer extends Layer {
 

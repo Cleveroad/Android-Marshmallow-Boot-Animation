@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
 				if (animation.getState() == LoadingAnimation.STATE_PAUSED || animation.getState() == LoadingAnimation.STATE_STOPPED) {
 					animation.startAnimation();
 				} else {
-					animation.stopAnimation();
+					animation.pauseAnimation();
 				}
 			}
 		});
