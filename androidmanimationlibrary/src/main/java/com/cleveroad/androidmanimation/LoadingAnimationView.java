@@ -1,21 +1,16 @@
 package com.cleveroad.androidmanimation;
 
 import android.annotation.TargetApi;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.os.Build;
-import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
-import android.view.Window;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -60,35 +55,24 @@ public class LoadingAnimationView extends View {
 		init(context, attrs);
 	}
 
-	private void fromBuilder(@NonNull Builder builder) {
-		if (builder.firstColor == null)
-			builder.firstColor = getColor(builder.context, R.color.google_red);
-		if (builder.secondColor == null)
-			builder.secondColor = getColor(builder.context, R.color.google_green);
-		if (builder.thirdColor == null)
-			builder.thirdColor = getColor(builder.context, R.color.google_blue);
-		if (builder.fourthColor == null)
-			builder.fourthColor = getColor(builder.context, R.color.google_yellow);
-		if (builder.backgroundColor == null)
-			builder.backgroundColor = Color.BLACK;
-		initValues(builder.firstColor, builder.secondColor, builder.thirdColor, builder.fourthColor,
-				builder.backgroundColor, builder.speedCoefficient);
+	void fromBuilder(@NonNull AnimationDialogFragment.Builder builder) {
+		initValues(
+				builder.getFirstColor(getContext()),
+				builder.getSecondColor(getContext()),
+				builder.getThirdColor(getContext()),
+				builder.getFourthColor(getContext()),
+				builder.getBackgroundColor(),
+				builder.getSpeedCoefficient()
+		);
 	}
 
-	@SuppressWarnings("deprecation")
-	private int getColor(@NonNull Context context, int colorId) {
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			return context.getColor(colorId);
-		}
-		return context.getResources().getColor(colorId);
-	}
 
-	@SuppressWarnings("deprecation")
+
 	private void init(Context context, AttributeSet attrs) {
-		int googleBlue = getContext().getResources().getColor(R.color.google_blue);
-		int googleYellow = getContext().getResources().getColor(R.color.google_yellow);
-		int googleRed = getContext().getResources().getColor(R.color.google_red);
-		int googleGreen = getContext().getResources().getColor(R.color.google_green);
+		int googleBlue = ColorUtil.getColor(context, R.color.google_blue);
+		int googleYellow = ColorUtil.getColor(context, R.color.google_yellow);
+		int googleRed = ColorUtil.getColor(context, R.color.google_red);
+		int googleGreen = ColorUtil.getColor(context, R.color.google_green);
 
 		TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.LoadingAnimationView);
 		int firstColor;
@@ -98,12 +82,12 @@ public class LoadingAnimationView extends View {
 		int bgColor;
 		float speedCoefficient;
 		try {
-			firstColor = typedArray.getColor(R.styleable.LoadingAnimationView_la_firstColor, googleRed);
-			secondColor = typedArray.getColor(R.styleable.LoadingAnimationView_la_secondColor, googleGreen);
-			thirdColor = typedArray.getColor(R.styleable.LoadingAnimationView_la_thirdColor, googleBlue);
-			fourthColor = typedArray.getColor(R.styleable.LoadingAnimationView_la_fourthColor, googleYellow);
-			bgColor = typedArray.getColor(R.styleable.LoadingAnimationView_la_backgroundColor, Color.BLACK);
-			speedCoefficient = typedArray.getFloat(R.styleable.LoadingAnimationView_la_speedCoefficient, Constants.DEFAULT_SPEED_COEFFICIENT);
+			firstColor = typedArray.getColor(R.styleable.LoadingAnimationView_lav_firstColor, googleRed);
+			secondColor = typedArray.getColor(R.styleable.LoadingAnimationView_lav_secondColor, googleGreen);
+			thirdColor = typedArray.getColor(R.styleable.LoadingAnimationView_lav_thirdColor, googleBlue);
+			fourthColor = typedArray.getColor(R.styleable.LoadingAnimationView_lav_fourthColor, googleYellow);
+			bgColor = typedArray.getColor(R.styleable.LoadingAnimationView_lav_backgroundColor, Color.BLACK);
+			speedCoefficient = typedArray.getFloat(R.styleable.LoadingAnimationView_lav_speedCoefficient, Constants.DEFAULT_SPEED_COEFFICIENT);
 		} finally {
 			typedArray.recycle();
 		}
@@ -149,14 +133,11 @@ public class LoadingAnimationView extends View {
 			startTime = endTime;
 		}
 		float left = getPaddingLeft();
-		//float top = getPaddingTop();
 		float right = getPaddingRight();
-		//float bottom = getPaddingBottom();
 		float maxWidth = 1f * (getWidth() - (left + right)) / LAYERS_COUNT;
 		float spacing = maxWidth * 0.1f;
 		float size = maxWidth - spacing;
 		float halfSize = size / 2f;
-		// float cy = (getHeight() - (top + bottom) - size) / 2f;
 
 		for (int i = 0; i< LAYERS_COUNT; i++) {
 			float l = left + i * (size + spacing);
@@ -241,131 +222,5 @@ public class LoadingAnimationView extends View {
 	 */
 	public int getState() {
 		return state;
-	}
-
-	/**
-	 * Builder class for dialog with loading animation.
-	 */
-	public static final class Builder {
-
-		private final Context context;
-		private Integer firstColor, secondColor, thirdColor, fourthColor;
-		private Integer backgroundColor;
-		private float speedCoefficient;
-		private DialogInterface.OnDismissListener onDismissListener;
-		private DialogInterface.OnShowListener onShowListener;
-
-		public Builder(@NonNull Context context) {
-			this.context = context;
-		}
-
-		/**
-		 * Set first color. Default value: red.
-		 * @param firstColor first color
-		 */
-		public Builder setFirstColor(@ColorInt int firstColor) {
-			this.firstColor = firstColor;
-			return this;
-		}
-
-		/**
-		 * Set second color. Default value: green.
-		 * @param secondColor second color
-		 */
-		public Builder setSecondColor(@ColorInt int secondColor) {
-			this.secondColor = secondColor;
-			return this;
-		}
-
-		/**
-		 * Set third color. Default value: blue.
-		 * @param thirdColor third color
-		 */
-		public Builder setThirdColor(@ColorInt int thirdColor) {
-			this.thirdColor = thirdColor;
-			return this;
-		}
-
-		/**
-		 * Set fourth color. Default value: yellow.
-		 * @param fourthColor fourth color
-		 */
-		public Builder setFourthColor(@ColorInt int fourthColor) {
-			this.fourthColor = fourthColor;
-			return this;
-		}
-
-		/**
-		 * Set background color. Default value: black.
-		 * @param backgroundColor background color
-		 */
-		public Builder setBackgroundColor(@ColorInt int backgroundColor) {
-			this.backgroundColor = backgroundColor;
-			return this;
-		}
-
-		/**
-		 * Set speed coefficient. Default value: 1.
-		 * @param speedCoefficient speed coefficient in range <code>[0..Integer.MAX_VALUE]</code>
-		 */
-		public Builder setSpeedCoefficient(float speedCoefficient) {
-			this.speedCoefficient = speedCoefficient;
-			return this;
-		}
-
-		/**
-		 * Set onDismissListener.
-		 * @param onDismissListener instance of listener
-		 */
-		public Builder setOnDismissListener(@Nullable DialogInterface.OnDismissListener onDismissListener) {
-			this.onDismissListener = onDismissListener;
-			return this;
-		}
-
-		/**
-		 * Set onShowListener.
-		 * @param onShowListener instance of listener
-		 */
-		public Builder setOnShowListener(DialogInterface.OnShowListener onShowListener) {
-			this.onShowListener = onShowListener;
-			return this;
-		}
-
-		/**
-		 * Create new dialog with loading animation.
-		 * @return created dialog.
-		 */
-		public Dialog build() {
-			if (speedCoefficient < 0) {
-				throw new IllegalArgumentException("Speed coefficient must be positive.");
-			}
-			if (speedCoefficient == 0) {
-				speedCoefficient = Constants.DEFAULT_SPEED_COEFFICIENT;
-			}
-			Dialog dialog = new Dialog(context);
-			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-			dialog.setContentView(R.layout.view_loading_animation);
-			final LoadingAnimationView animation = (LoadingAnimationView) dialog.findViewById(R.id.animation);
-			animation.fromBuilder(this);
-			dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-				@Override
-				public void onShow(DialogInterface dialog) {
-					animation.startAnimation();
-					if (onShowListener != null) {
-						onShowListener.onShow(dialog);
-					}
-				}
-			});
-			dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-				@Override
-				public void onDismiss(DialogInterface dialog) {
-					animation.stopAnimation();
-					if (onDismissListener != null) {
-						onDismissListener.onDismiss(dialog);
-					}
-				}
-			});
-			return dialog;
-		}
 	}
 }

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="LoadingAnimationView">
-        <attr name="la_firstColor" format="color"/>
-        <attr name="la_secondColor" format="color"/>
-        <attr name="la_thirdColor" format="color"/>
-        <attr name="la_fourthColor" format="color"/>
-        <attr name="la_backgroundColor" format="color"/>
-        <attr name="la_speedCoefficient" format="float"/>
+        <attr name="lav_firstColor" format="color"/>
+        <attr name="lav_secondColor" format="color"/>
+        <attr name="lav_thirdColor" format="color"/>
+        <attr name="lav_fourthColor" format="color"/>
+        <attr name="lav_backgroundColor" format="color"/>
+        <attr name="lav_speedCoefficient" format="float"/>
     </declare-styleable>
 </resources>

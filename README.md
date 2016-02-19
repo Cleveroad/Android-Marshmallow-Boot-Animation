@@ -14,12 +14,12 @@ To use LoadingAnimationView you can declare it in your layout file like this:
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="16dp"
-        app:la_backgroundColor="@android:color/black"
-        app:la_firstColor="@color/google_red"
-        app:la_secondColor="@color/google_green"
-        app:la_thirdColor="@color/google_blue"
-        app:la_fourthColor="@color/google_yellow"
-        app:la_speedCoefficient="1.0"
+        app:lav_backgroundColor="@android:color/black"
+        app:lav_firstColor="@color/google_red"
+        app:lav_secondColor="@color/google_green"
+        app:lav_thirdColor="@color/google_blue"
+        app:lav_fourthColor="@color/google_yellow"
+        app:lav_speedCoefficient="1.0"
         />
 ```
 
@@ -55,28 +55,15 @@ Pay attention that you need to manually start/pause/stop animation.
 Another way to display loading animation is to use builder and display a dialog:
  
 ```JAVA
-    new LoadingAnimation
-        .Builder(getContext())
-        .setBackgroundColor(Color.BLACK)
-        .setFirstColor(getContext().getColor(R.color.google_red))
-        .setSecondColor(getContext().getColor(R.color.google_green))
-        .setThirdColor(getContext().getColor(R.color.google_blue))
-        .setFourthColor(getContext().getColor(R.color.google_yellow))
-        .setSpeedCoefficient(1.0f)
-        .setOnShowListener(new DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(DialogInterface dialog) {
-                Log.d("ANIMATION", "Yay! Playing animation.");
-            }
-        })
-        .setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                Log.d("ANIMATION", "Doh! Stopping animation.");
-            }
-        })
-        .build()
-        .show();
+    AnimationDialogFragment fragment = new AnimationDialogFragment.Builder()
+            .setBackgroundColor(Color.WHITE)
+            .setFirstColor(getResources().getColor(R.color.google_red))
+            .setSecondColor(getResources().getColor(R.color.google_green))
+            .setThirdColor(getResources().getColor(R.color.google_blue))
+            .setFourthColor(getResources().getColor(R.color.google_yellow))
+            .setSpeedCoefficient(1.0f)
+            .build();
+    fragment.show(getSupportFragmentManager(), "Animation");
 ```
 
 <br />
