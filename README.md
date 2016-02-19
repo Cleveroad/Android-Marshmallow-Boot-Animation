@@ -7,7 +7,7 @@ Implementation of [Android Marshmallow Boot Animation](https://dribbble.com/shot
 To use LoadingAnimationView you can declare it in your layout file like this:
 
 ```XML
-    <com.cleveroad.androidmanimation.LoadingAnimation
+    <com.cleveroad.androidmanimation.LoadingAnimationView
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/animation"
@@ -26,7 +26,7 @@ To use LoadingAnimationView you can declare it in your layout file like this:
 Pay attention that you need to manually start/pause/stop animation.
 
 ```JAVA
-    private LoadingAnimation animation;
+    private LoadingAnimationView animation;
     
     ...
     
