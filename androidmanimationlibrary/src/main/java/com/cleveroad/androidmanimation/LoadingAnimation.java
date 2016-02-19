@@ -2,6 +2,7 @@ package com.cleveroad.androidmanimation;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -37,7 +38,8 @@ public class LoadingAnimation extends View {
 	}
 
 	public LoadingAnimation(Context context, AttributeSet attrs) {
-		this(context, attrs, 0);
+		super(context, attrs);
+		init(context, attrs);
 	}
 
 	public LoadingAnimation(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -50,26 +52,51 @@ public class LoadingAnimation extends View {
 		init(context, attrs);
 	}
 
+	@SuppressWarnings("deprecation")
 	private void init(Context context, AttributeSet attrs) {
 		Paint bluePaint = new Paint();
 		Paint yellowPaint = new Paint();
 		Paint redPaint = new Paint();
 		Paint greenPaint = new Paint();
-		bluePaint.setColor(context.getResources().getColor(R.color.google_blue));
+
+		int googleBlue = getContext().getResources().getColor(R.color.google_blue);
+		int googleYellow = getContext().getResources().getColor(R.color.google_yellow);
+		int googleRed = getContext().getResources().getColor(R.color.google_red);
+		int googleGreen = getContext().getResources().getColor(R.color.google_green);
+
+		TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.LoadingAnimation);
+		int firstColor;
+		int secondColor;
+		int thirdColor;
+		int fourthColor;
+		int bgColor;
+		try {
+			firstColor = typedArray.getColor(R.styleable.LoadingAnimation_firstColor, googleBlue);
+			secondColor = typedArray.getColor(R.styleable.LoadingAnimation_secondColor, googleYellow);
+			thirdColor = typedArray.getColor(R.styleable.LoadingAnimation_thirdColor, googleRed);
+			fourthColor = typedArray.getColor(R.styleable.LoadingAnimation_fourthColor, googleGreen);
+			bgColor = typedArray.getColor(R.styleable.LoadingAnimation_bgColor, Color.BLACK);
+			Constants.SPEED_COEFFICIENT = typedArray.getFloat(R.styleable.LoadingAnimation_speedCoefficient, Constants.DEFAULT_SPEED_COEFFICIENT);
+		} finally {
+			typedArray.recycle();
+		}
+
+		bluePaint.setColor(firstColor);
 		bluePaint.setAntiAlias(true);
-		yellowPaint.setColor(context.getResources().getColor(R.color.google_yellow));
+		yellowPaint.setColor(secondColor);
 		yellowPaint.setAntiAlias(true);
-		redPaint.setColor(context.getResources().getColor(R.color.google_red));
+		redPaint.setColor(thirdColor);
 		redPaint.setAntiAlias(true);
-		greenPaint.setColor(context.getResources().getColor(R.color.google_green));
+		greenPaint.setColor(fourthColor);
 		greenPaint.setAntiAlias(true);
 		Paint bgPaint = new Paint();
-		bgPaint.setColor(Color.BLACK);
+		bgPaint.setColor(bgColor);
 		bgPaint.setAntiAlias(true);
+
 		layers[0] = new FirstLayer(bluePaint, greenPaint, yellowPaint, bgPaint);
 		layers[1] = new SecondLayer(redPaint, yellowPaint, bgPaint);
 		layers[2] = new ThirdLayer(redPaint, greenPaint, bgPaint);
-		layers[3] = new FourthLayer(redPaint, greenPaint, bluePaint, yellowPaint);
+		layers[3] = new FourthLayer(redPaint, greenPaint, bluePaint, yellowPaint, bgPaint);
 		yellowRectangle = new YellowRectangle(yellowPaint);
 	}
 
@@ -85,19 +112,16 @@ public class LoadingAnimation extends View {
 			startTime = endTime;
 		}
 		float left = getPaddingLeft();
-		float top = getPaddingTop();
+		//float top = getPaddingTop();
 		float right = getPaddingRight();
-		float bottom = getPaddingBottom();
+		//float bottom = getPaddingBottom();
 		float maxWidth = 1f * (getWidth() - (left + right)) / LAYERS_COUNT;
 		float spacing = maxWidth * 0.1f;
 		float size = maxWidth - spacing;
 		float halfSize = size / 2f;
-		float cy = (getHeight() - (top + bottom) - size) / 2f;
+		// float cy = (getHeight() - (top + bottom) - size) / 2f;
 
 		for (int i = 0; i< LAYERS_COUNT; i++) {
-			// TODO: 15.02.2016 remove check
-			if (layers[i] == null)
-				continue;
 			float l = left + i * (size + spacing);
 			float t = getHeight() / 2f - halfSize;
 			float r = l + size;
@@ -157,9 +181,6 @@ public class LoadingAnimation extends View {
 
 	private void resetAll() {
 		for (Layer layer : layers) {
-			// TODO: 15.02.2016 remove check
-			if (layer == null)
-				continue;
 			layer.reset();
 		}
 		yellowRectangle.reset();

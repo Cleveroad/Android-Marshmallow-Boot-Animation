@@ -8,9 +8,11 @@ class Constants {
 	private Constants() {
 	}
 
-	public static final float SPEED_COEFFICIENT = 1f;
+	public static final float DEFAULT_SPEED_COEFFICIENT = 1f;
 
-	public static final long TOTAL_DURATION = 4530;
+	public static float SPEED_COEFFICIENT;
+
+	public static final int TOTAL_DURATION = 4530;
 
 	public static final int TOTAL_FRAMES = 151;
 

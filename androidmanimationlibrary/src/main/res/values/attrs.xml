@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="LoadingAnimation">
+        <attr name="firstColor" format="color"/>
+        <attr name="secondColor" format="color"/>
+        <attr name="thirdColor" format="color"/>
+        <attr name="fourthColor" format="color"/>
+        <attr name="bgColor" format="color"/>
+        <attr name="duration" format="integer"/>
+        <attr name="speedCoefficient" format="float"/>
+    </declare-styleable>
+</resources>
