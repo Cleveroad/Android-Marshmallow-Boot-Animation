@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Android M Animation Example</string>
+    <string name="activity">Activity</string>
+    <string name="dialog">Dialog</string>
 </resources>

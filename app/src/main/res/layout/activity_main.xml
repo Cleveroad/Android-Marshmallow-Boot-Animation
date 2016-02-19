@@ -1,15 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.cleveroad.androidmanimation.LoadingAnimation
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/animation"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
     android:padding="16dp"
-    android:background="@android:color/black"
-    app:firstColor="#ff33b5e5"
-    app:secondColor="#FFFF00"
-    app:thirdColor="#ffcc0000"
-    app:fourthColor="#008000"
-    app:speedCoefficient="0.1"
-    />
+    >
+
+    <Button
+        android:id="@+id/btn_activity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/activity"
+        />
+
+    <Button
+        android:id="@+id/btn_dialog"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/dialog"
+        />
+
+</LinearLayout>
+<!--<com.cleveroad.androidmanimation.LoadingAnimation-->
+    <!--xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
+    <!--android:id="@+id/animation"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:padding="16dp"-->
+    <!--app:la_backgroundColor="@android:color/black"-->
+    <!--app:la_speedCoefficient="1"-->
+    <!--/>-->

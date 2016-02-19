@@ -15,7 +15,7 @@ class FourthLayer extends Layer {
 	private final DrawableObject[] objects;
 
 	public FourthLayer(Paint redPaint, Paint greenPaint, Paint bluePaint, Paint yellowPaint, Paint bgPaint) {
-		objects = new DrawableObject[9];
+		objects = new DrawableObject[8];
 		objects[0] = new BlueArc(bluePaint);
 		objects[1] = new YellowArc(yellowPaint);
 		objects[2] = new GreenCircle(greenPaint, bgPaint);
@@ -24,7 +24,6 @@ class FourthLayer extends Layer {
 		objects[5] = new RedCircle(redPaint);
 		objects[6] = new YellowCircle(yellowPaint, true); // second yellow circle
 		objects[7] = new BlackCircle(bgPaint);
-		objects[8] = new YellowBall(yellowPaint);
 	}
 
 	@Override
@@ -59,7 +58,7 @@ class FourthLayer extends Layer {
 		private static final float FRACTION_ENLARGING_END = 146 * Constants.FRAME_SPEED;
 
 		private static final float IDLE_2_FRACTION_START = 146 * Constants.FRAME_SPEED;
-		private static final float IDLE_2_FRACTION_END = 148 * Constants.FRAME_SPEED;
+		private static final float IDLE_2_FRACTION_END = 149 * Constants.FRAME_SPEED;
 
 		// DIMENSIONS
 		private static final float SIZE_FRACTION_75 = 0.75f;
@@ -107,9 +106,9 @@ class FourthLayer extends Layer {
 	private static final class BlueCircle extends DrawableObjectImpl {
 		// TIMING
 		private static final float IDLE_1_FRACTION_START = 0f;
-		private static final float IDLE_1_FRACTION_END = 138 * Constants.FRAME_SPEED;
+		private static final float IDLE_1_FRACTION_END = 137 * Constants.FRAME_SPEED;
 
-		private static final float FRACTION_ENLARGING_START = 138 * Constants.FRAME_SPEED;
+		private static final float FRACTION_ENLARGING_START = 137 * Constants.FRAME_SPEED;
 		private static final float FRACTION_ENLARGING_END = 143 * Constants.FRAME_SPEED;
 
 		private static final float IDLE_2_FRACTION_START = 143 * Constants.FRAME_SPEED;
@@ -161,9 +160,9 @@ class FourthLayer extends Layer {
 	private static final class YellowCircle extends DrawableObjectImpl {
 		// TIMING FOR FIRST YELLOW CIRCLE
 		private static final float IDLE_FRACTION_1_START = 0f;
-		private static final float IDLE_FRACTION_1_END = 133 * Constants.FRAME_SPEED;
+		private static final float IDLE_FRACTION_1_END = 131 * Constants.FRAME_SPEED;
 
-		private static final float FRACTION_ENLARGING_1_START = 133 * Constants.FRAME_SPEED;
+		private static final float FRACTION_ENLARGING_1_START = 131 * Constants.FRAME_SPEED;
 		private static final float FRACTION_ENLARGING_1_END = 139 * Constants.FRAME_SPEED;
 
 		private static final float IDLE_FRACTION_2_START = 139 * Constants.FRAME_SPEED;
@@ -227,54 +226,6 @@ class FourthLayer extends Layer {
 				return DrawableUtils.enlarge(SIZE_FRACTION_0, SIZE_FRACTION_75, time);
 			}
 			return SIZE_FRACTION_75;
-		}
-
-		@Override
-		public void draw(@NonNull Canvas canvas) {
-			if (width > 0) {
-				canvas.drawCircle(getBounds().centerX(), getBounds().centerY(), width / 2f, getPaint());
-			}
-		}
-	}
-
-	private static final class YellowBall extends DrawableObjectImpl {
-		// TIMING
-		private static final float IDLE_FRACTION_1_START = 0f;
-		private static final float IDLE_FRACTION_1_END = 131 * Constants.FRAME_SPEED;
-
-		private static final float FRACTION_REDUCING_1_START = 131 * Constants.FRAME_SPEED;
-		private static final float FRACTION_REDUCING_1_END = 137 * Constants.FRAME_SPEED;
-
-		// DIMENSIONS
-		private static final float SIZE_FRACTION_20 = 0.2f;
-		private static final float SIZE_FRACTION_0 = 0f;
-
-		private float width;
-
-		public YellowBall(Paint paint) {
-			super(paint);
-		}
-
-		@Override
-		protected float getSizeFraction() {
-			return 1.0f;
-		}
-
-		@Override
-		protected void update(@NonNull RectF bounds, long dt, float ddt) {
-			width = getBounds().width() * getWidthFraction(ddt);
-		}
-
-		private float getWidthFraction(float ddt) {
-			float time;
-			if (DrawableUtils.between(ddt, IDLE_FRACTION_1_START, IDLE_FRACTION_1_END)) {
-				return SIZE_FRACTION_0;
-			}
-			if (DrawableUtils.between(ddt, FRACTION_REDUCING_1_START, FRACTION_REDUCING_1_END)) {
-				time = DrawableUtils.normalize(ddt, FRACTION_REDUCING_1_START, FRACTION_REDUCING_1_END);
-				return DrawableUtils.reduce(SIZE_FRACTION_20, SIZE_FRACTION_0, time);
-			}
-			return SIZE_FRACTION_0;
 		}
 
 		@Override
@@ -453,8 +404,8 @@ class FourthLayer extends Layer {
 		private static final float IDLE_1_ANGLE_START = 0f;
 		private static final float IDLE_1_ANGLE_END = 29 * Constants.FRAME_SPEED;
 
-		private static final float ANGLE_CHANGING_START = 29 * Constants.FRAME_SPEED;
-		private static final float ANGLE_CHANGING_END = 59 * Constants.FRAME_SPEED;
+		private static final float ANGLE_CHANGING_START = 34 * Constants.FRAME_SPEED;
+		private static final float ANGLE_CHANGING_END = 60 * Constants.FRAME_SPEED;
 
 		// DIMENSIONS
 		private static final float SIZE_FRACTION_60 = 0.6f;
@@ -556,8 +507,8 @@ class FourthLayer extends Layer {
 		private static final float IDLE_ANGLE_1_START = 0f;
 		private static final float IDLE_ANGLE_1_END = 27 * Constants.FRAME_SPEED;
 
-		private static final float ANGLE_CHANGING_START = 27 * Constants.FRAME_SPEED;
-		private static final float ANGLE_CHANGING_END = 59 * Constants.FRAME_SPEED;
+		private static final float ANGLE_CHANGING_START = 26 * Constants.FRAME_SPEED;
+		private static final float ANGLE_CHANGING_END = 60 * Constants.FRAME_SPEED;
 
 		// DIMENSIONS
 		private static final float SIZE_FRACTION_75 = 0.75f;
