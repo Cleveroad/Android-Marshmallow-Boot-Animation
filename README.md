@@ -4,7 +4,15 @@ Implementation of [Android Marshmallow Boot Animation](https://dribbble.com/shot
 
 ![Demo image](/images/animation_demo.gif)
 
-To use LoadingAnimationView you can declare it in your layout file like this:
+To use LoadingAnimationView first add dependency to your project:
+ 
+```groovy
+dependencies {
+    compile 'com.cleveroad:androidmanimation:0.9.0'
+}
+``` 
+ 
+Then you can declare it in your layout file like this:
 
 ```XML
     <com.cleveroad.androidmanimation.LoadingAnimationView
