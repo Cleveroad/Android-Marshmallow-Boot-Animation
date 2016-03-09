@@ -84,6 +84,7 @@ Another way to display loading animation is to use builder and display a dialog:
 #### Migrations from v.0.9.0 to v.0.9.1
 * **LoadingAnimationView.getState()** was replaced with **LoadingAnimationView.isRunning()** method.
 * All resources marked as private, prefix `lav_` added to their names.
+* Minimum SDK version set to 12
 
 
 <br />
