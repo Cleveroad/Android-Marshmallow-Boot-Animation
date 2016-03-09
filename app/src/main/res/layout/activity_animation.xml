@@ -7,9 +7,5 @@
     android:layout_height="match_parent"
     android:padding="16dp"
     app:lav_backgroundColor="@android:color/black"
-    app:lav_firstColor="@color/google_red"
-    app:lav_secondColor="@color/google_green"
-    app:lav_thirdColor="@color/google_blue"
-    app:lav_fourthColor="@color/google_yellow"
     app:lav_speedCoefficient="1.0"
     />

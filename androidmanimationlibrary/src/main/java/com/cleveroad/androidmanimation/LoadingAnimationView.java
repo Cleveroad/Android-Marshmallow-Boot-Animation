@@ -14,6 +14,8 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 
+import java.util.Random;
+
 /**
  * Android M Loading animation view.
  */
@@ -25,6 +27,7 @@ public class LoadingAnimationView extends View {
     private YellowRectangle yellowRectangle;
     private final RectF bounds = new RectF();
     private ValueAnimator valueAnimator;
+    private Random random;
 
 	private int bgColor;
 
@@ -61,10 +64,10 @@ public class LoadingAnimationView extends View {
 
 
 	private void init(Context context, AttributeSet attrs) {
-		int googleBlue = ColorUtil.getColor(context, R.color.google_blue);
-		int googleYellow = ColorUtil.getColor(context, R.color.google_yellow);
-		int googleRed = ColorUtil.getColor(context, R.color.google_red);
-		int googleGreen = ColorUtil.getColor(context, R.color.google_green);
+		int googleBlue = ColorUtil.getColor(context, R.color.lav_google_blue);
+		int googleYellow = ColorUtil.getColor(context, R.color.lav_google_yellow);
+		int googleRed = ColorUtil.getColor(context, R.color.lav_google_red);
+		int googleGreen = ColorUtil.getColor(context, R.color.lav_google_green);
 
 		TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.LoadingAnimationView);
 		int firstColor;
@@ -118,17 +121,16 @@ public class LoadingAnimationView extends View {
         valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                updateAnimation(animation);
+                updateAnimation(getWidth(), animation.getAnimatedFraction());
                 invalidate();
             }
         });
 	}
 
-    private void updateAnimation(ValueAnimator animation) {
-        float dt = animation.getAnimatedFraction();
+    private void updateAnimation(float width, float dt) {
         float left = getPaddingLeft();
         float right = getPaddingRight();
-        float maxWidth = 1f * (getWidth() - (left + right)) / LAYERS_COUNT;
+        float maxWidth = 1f * (width - (left + right)) / LAYERS_COUNT;
         float spacing = maxWidth * 0.1f;
         float size = maxWidth - spacing;
         float halfSize = size / 2f;
@@ -154,6 +156,12 @@ public class LoadingAnimationView extends View {
 
     @Override
 	public void onDraw(Canvas canvas) {
+        if (isInEditMode()) {
+            if (random == null) {
+                random = new Random();
+            }
+            updateAnimation(canvas.getWidth(), random.nextFloat());
+        }
 		canvas.drawColor(bgColor);
 		for (int i = 0; i< LAYERS_COUNT; i++) {
 			layers[i].draw(canvas);
@@ -175,14 +183,14 @@ public class LoadingAnimationView extends View {
 	}
 
 	/**
-	 * Pause animation.
+	 * Pause animation. It behaves like {@link #stopAnimation()} on API < 19.
 	 */
-	@TargetApi(Build.VERSION_CODES.KITKAT)
     public void pauseAnimation() {
-		if (!valueAnimator.isRunning() || valueAnimator.isPaused()) {
-            return;
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+            stopAnimation();
+        } else if (!valueAnimator.isPaused()) {
+            valueAnimator.pause();
         }
-        valueAnimator.pause();
 	}
 
 	/**

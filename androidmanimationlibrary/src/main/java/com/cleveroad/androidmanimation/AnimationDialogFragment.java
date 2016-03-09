@@ -37,7 +37,7 @@ public class AnimationDialogFragment extends DialogFragment {
 	@Nullable
 	@Override
 	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.view_loading_animation, container, false);
+		return inflater.inflate(R.layout.lav_view_loading_animation, container, false);
 	}
 
 	@Override
@@ -137,25 +137,25 @@ public class AnimationDialogFragment extends DialogFragment {
 
 		int getFirstColor(@NonNull Context context) {
 			if (firstColor == null)
-				return ColorUtil.getColor(context, R.color.google_red);
+				return ColorUtil.getColor(context, R.color.lav_google_red);
 			return firstColor;
 		}
 
 		int getSecondColor(@NonNull Context context) {
 			if (secondColor == null)
-				return ColorUtil.getColor(context, R.color.google_green);
+				return ColorUtil.getColor(context, R.color.lav_google_green);
 			return secondColor;
 		}
 
 		int getThirdColor(@NonNull Context context) {
 			if (thirdColor == null)
-				return ColorUtil.getColor(context, R.color.google_blue);
+				return ColorUtil.getColor(context, R.color.lav_google_blue);
 			return thirdColor;
 		}
 
 		int getFourthColor(@NonNull Context context) {
 			if (fourthColor == null)
-				return ColorUtil.getColor(context, R.color.google_yellow);
+				return ColorUtil.getColor(context, R.color.lav_google_yellow);
 			return fourthColor;
 		}
 
