@@ -1,5 +1,6 @@
 package com.cleveroad.example.androidmanimation;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -22,12 +23,13 @@ public class AnimationActivity extends AppCompatActivity {
 		animation.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				int state = animation.getState();
-				if (state == LoadingAnimationView.STATE_STOPPED || state == LoadingAnimationView.STATE_PAUSED) {
+				if (!animation.isRunning()) {
 					animation.startAnimation();
+				} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+					animation.pauseAnimation();
 				} else {
-					animation.stopAnimation();
-				}
+                    animation.stopAnimation();
+                }
 			}
 		});
 	}

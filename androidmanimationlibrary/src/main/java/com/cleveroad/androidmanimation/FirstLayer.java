@@ -24,7 +24,7 @@ class FirstLayer extends Layer {
 	}
 
 	@Override
-	public void update(@NonNull RectF bounds, long dt) {
+	public void update(@NonNull RectF bounds, float dt) {
 		for (DrawableObject object : objects) {
 			object.update(bounds, dt);
 		}
@@ -74,7 +74,7 @@ class FirstLayer extends Layer {
 		}
 
 		@Override
-		protected void update(@NonNull RectF bounds, long dt, float ddt) {
+		protected void updateImpl(@NonNull RectF bounds, float ddt) {
 			draw = DrawableUtils.between(ddt, FRACTION_START, FRACTION_END);
 			if (!draw) {
 				return;
@@ -157,7 +157,7 @@ class FirstLayer extends Layer {
 		}
 
 		@Override
-		protected void update(@NonNull RectF bounds, long dt, float ddt) {
+		protected void updateImpl(@NonNull RectF bounds, float ddt) {
 			getPaint().setStrokeWidth(bounds.width() * 0.08f);
 			draw = DrawableUtils.between(ddt, FRACTION_START, FRACTION_END);
 			if (!draw) {
@@ -209,7 +209,7 @@ class FirstLayer extends Layer {
 		}
 
 		@Override
-		protected void update(@NonNull RectF bounds, long dt, float ddt) {
+		protected void updateImpl(@NonNull RectF bounds, float ddt) {
 			yellowSize = computeYellowSizeFraction(ddt) * getBounds().width();
 			blackSize = computeBlackSizeFraction(ddt) * getBounds().width();
 		}
@@ -283,7 +283,7 @@ class FirstLayer extends Layer {
 		}
 
 		@Override
-		public void update(@NonNull RectF bounds, long dt, float ddt) {
+		public void updateImpl(@NonNull RectF bounds, float ddt) {
 			diameter = computeSizeFraction(ddt) * getBounds().width();
 		}
 
