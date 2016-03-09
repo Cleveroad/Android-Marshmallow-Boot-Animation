@@ -9,7 +9,7 @@ import android.support.annotation.NonNull;
  */
 interface DrawableObject {
 
-	void update(@NonNull RectF bounds, long dt);
+	void update(@NonNull RectF bounds, float dt);
 
 	void draw(@NonNull Canvas canvas);
 }

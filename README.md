@@ -8,7 +8,7 @@ To use LoadingAnimationView first add dependency to your project:
  
 ```groovy
 dependencies {
-    compile 'com.cleveroad:androidmanimation:0.9.0'
+    compile 'com.cleveroad:androidmanimation:0.9.1'
 }
 ``` 
  
@@ -73,6 +73,19 @@ Another way to display loading animation is to use builder and display a dialog:
             .build();
     fragment.show(getSupportFragmentManager(), "Animation");
 ```
+
+## Changelog
+
+| Version | Changes                         |
+| --- | --- |
+| v.0.9.1 | Replaced Timer with ValueAnimator |
+| v.0.9.0 | First public release            |
+
+#### Migrations from v.0.9.0 to v.0.9.1
+* **LoadingAnimationView.getState()** was replaced with **LoadingAnimationView.isRunning()** method.
+* All resources marked as private, prefix `lav_` added to their names.
+* Minimum SDK version set to 12
+
 
 <br />
 #### Support ####

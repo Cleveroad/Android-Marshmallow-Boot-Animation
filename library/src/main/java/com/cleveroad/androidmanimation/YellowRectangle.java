@@ -79,7 +79,7 @@ final class YellowRectangle extends DrawableObjectImpl {
 	}
 
 	@Override
-	protected void update(@NonNull RectF bounds, long dt, float ddt) {
+	protected void updateImpl(@NonNull RectF bounds, float ddt) {
 		draw = DrawableUtils.between(ddt, VISIBILITY_FRACTION_START, VISIBILITY_FRACTION_END);
 		if (!draw) {
 			return;

@@ -27,7 +27,7 @@ class FourthLayer extends Layer {
 	}
 
 	@Override
-	public void update(@NonNull RectF bounds, long dt) {
+	public void update(@NonNull RectF bounds, float dt) {
 		for (DrawableObject object : objects) {
 			object.update(bounds, dt);
 		}
@@ -76,7 +76,7 @@ class FourthLayer extends Layer {
 		}
 
 		@Override
-		protected void update(@NonNull RectF bounds, long dt, float ddt) {
+		protected void updateImpl(@NonNull RectF bounds, float ddt) {
 			width = getWidthFraction(ddt) * getBounds().width();
 		}
 
@@ -130,7 +130,7 @@ class FourthLayer extends Layer {
 		}
 
 		@Override
-		protected void update(@NonNull RectF bounds, long dt, float ddt) {
+		protected void updateImpl(@NonNull RectF bounds, float ddt) {
 			width = getBounds().width() * getWidthFraction(ddt);
 		}
 
@@ -193,7 +193,7 @@ class FourthLayer extends Layer {
 		}
 
 		@Override
-		protected void update(@NonNull RectF bounds, long dt, float ddt) {
+		protected void updateImpl(@NonNull RectF bounds, float ddt) {
 			width = getBounds().width() * (isSecondCircle ? getWidthFractionSecondCircle(ddt) : getWidthFractionFirstCircle(ddt));
 		}
 
@@ -274,7 +274,7 @@ class FourthLayer extends Layer {
 		}
 
 		@Override
-		protected void update(@NonNull RectF bounds, long dt, float ddt) {
+		protected void updateImpl(@NonNull RectF bounds, float ddt) {
 			width = getBounds().width() * getWidthFraction(ddt);
 		}
 
@@ -353,7 +353,7 @@ class FourthLayer extends Layer {
 		}
 
 		@Override
-		protected void update(@NonNull RectF bounds, long dt, float ddt) {
+		protected void updateImpl(@NonNull RectF bounds, float ddt) {
 			width = getWidthFraction(ddt) * getBounds().width();
 			bgWidth = getBgWidthFraction(ddt) * getBounds().width();
 		}
@@ -434,7 +434,7 @@ class FourthLayer extends Layer {
 		}
 
 		@Override
-		protected void update(@NonNull RectF bounds, long dt, float ddt) {
+		protected void updateImpl(@NonNull RectF bounds, float ddt) {
 			float coef = getWidthFraction(ddt);
 			float leftRightMargin =  (getBounds().width() - getBounds().width() * coef) / 2f;
 			float topBottomMargin = (getBounds().height() - getBounds().height() * coef) / 2f;
@@ -538,7 +538,7 @@ class FourthLayer extends Layer {
 		}
 
 		@Override
-		protected void update(@NonNull RectF bounds, long dt, float ddt) {
+		protected void updateImpl(@NonNull RectF bounds, float ddt) {
 			float coef = getWidthFraction(ddt);
 			float leftRightMargin =  (getBounds().width() - getBounds().width() * coef) / 2f;
 			float topBottomMargin = (getBounds().height() - getBounds().height() * coef) / 2f;

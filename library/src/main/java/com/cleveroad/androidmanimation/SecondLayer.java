@@ -20,7 +20,7 @@ class SecondLayer extends Layer {
 	}
 
 	@Override
-	public void update(@NonNull RectF bounds, long dt) {
+	public void update(@NonNull RectF bounds, float dt) {
 		for (DrawableObject object : objects) {
 			object.update(bounds, dt);
 		}
@@ -97,7 +97,7 @@ class SecondLayer extends Layer {
 		}
 
 		@Override
-		protected void update(@NonNull RectF bounds, long dt, float ddt) {
+		protected void updateImpl(@NonNull RectF bounds, float ddt) {
 			draw = true;
 			dotSize = 0;
 			if (ddt < ENLARGE_1_FRACTION_START || ddt > REDUCE_2_FRACTION_END) {
@@ -239,7 +239,7 @@ class SecondLayer extends Layer {
 		}
 
 		@Override
-		protected void update(@NonNull RectF bounds, long dt, float ddt) {
+		protected void updateImpl(@NonNull RectF bounds, float ddt) {
 			size = getSizeFraction(ddt) * getBounds().width();
 		}
 
@@ -329,7 +329,7 @@ class SecondLayer extends Layer {
 		}
 
 		@Override
-		protected void update(@NonNull RectF bounds, long dt, float ddt) {
+		protected void updateImpl(@NonNull RectF bounds, float ddt) {
 			width = computeRedSizeFraction(ddt) * getBounds().width();
 			blackWidth = computeBlackSizeFraction(ddt) * getBounds().width();
 			yellowWidth = computeYellowSizeFraction(ddt) * getBounds().width();

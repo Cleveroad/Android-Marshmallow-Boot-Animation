@@ -11,7 +11,6 @@ abstract class DrawableObjectImpl implements DrawableObject, Resetable {
 
 	private final Paint paint;
 	private final RectF bounds;
-	private long duration;
 
 	public DrawableObjectImpl(Paint paint) {
 		this.paint = paint;
@@ -19,24 +18,19 @@ abstract class DrawableObjectImpl implements DrawableObject, Resetable {
 	}
 
 	@Override
-	public final void update(@NonNull RectF bounds, long dt) {
+	public final void update(@NonNull RectF bounds, float dt) {
 		float spacing = (1 - getSizeFraction()) / 2f;
 		float l = bounds.left + spacing * bounds.width();
 		float t = bounds.top + spacing * bounds.height();
 		float r = l + getSizeFraction() * bounds.width();
 		float b = t + getSizeFraction() * bounds.height();
 		getBounds().set(l, t, r, b);
-		this.duration += dt;
-		float dur = Constants.TOTAL_DURATION / Constants.SPEED_COEFFICIENT;
-		if (this.duration > dur) {
-			this.duration %= dur;
-		}
-		update(bounds, dt, 1f * duration / dur);
+		updateImpl(bounds, dt);
 	}
 
 	protected abstract float getSizeFraction();
 
-	protected abstract void update(@NonNull RectF bounds, long dt, float ddt);
+	protected abstract void updateImpl(@NonNull RectF bounds, float ddt);
 
 	public Paint getPaint() {
 		return paint;
@@ -48,6 +42,6 @@ abstract class DrawableObjectImpl implements DrawableObject, Resetable {
 
 	@Override
 	public void reset() {
-		duration = 0;
+
 	}
 }

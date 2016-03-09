@@ -1,5 +1,6 @@
 package com.cleveroad.androidmanimation;
 
+import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -11,29 +12,23 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.animation.LinearInterpolator;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.Random;
 
 /**
  * Android M Loading animation view.
  */
 public class LoadingAnimationView extends View {
 
-	public static final int STATE_STARTED = 1;
-	public static final int STATE_PAUSED = 2;
-	public static final int STATE_STOPPED = 0;
-
-	private static final long UPDATE_INTERVAL = 16;
 	private static final int LAYERS_COUNT = 4;
 
 	private final Layer[] layers = new Layer[LAYERS_COUNT];
-	private YellowRectangle yellowRectangle;
-	private final RectF bounds = new RectF();
+    private YellowRectangle yellowRectangle;
+    private final RectF bounds = new RectF();
+    private ValueAnimator valueAnimator;
+    private Random random;
 
-	private int state = STATE_STOPPED;
-	private long startTime;
-	private Timer timer;
 	private int bgColor;
 
 	public LoadingAnimationView(Context context) {
@@ -69,10 +64,10 @@ public class LoadingAnimationView extends View {
 
 
 	private void init(Context context, AttributeSet attrs) {
-		int googleBlue = ColorUtil.getColor(context, R.color.google_blue);
-		int googleYellow = ColorUtil.getColor(context, R.color.google_yellow);
-		int googleRed = ColorUtil.getColor(context, R.color.google_red);
-		int googleGreen = ColorUtil.getColor(context, R.color.google_green);
+		int googleBlue = ColorUtil.getColor(context, R.color.lav_google_blue);
+		int googleYellow = ColorUtil.getColor(context, R.color.lav_google_yellow);
+		int googleRed = ColorUtil.getColor(context, R.color.lav_google_red);
+		int googleGreen = ColorUtil.getColor(context, R.color.lav_google_green);
 
 		TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.LoadingAnimationView);
 		int firstColor;
@@ -119,44 +114,58 @@ public class LoadingAnimationView extends View {
 		layers[3] = new FourthLayer(redPaint, greenPaint, bluePaint, yellowPaint, bgPaint);
 		yellowRectangle = new YellowRectangle(yellowPaint);
 		Constants.SPEED_COEFFICIENT = speedCoefficient;
+        valueAnimator = ValueAnimator.ofFloat(0, 1);
+        valueAnimator.setInterpolator(new LinearInterpolator());
+        valueAnimator.setDuration((long) (Constants.TOTAL_DURATION * Constants.SPEED_COEFFICIENT));
+        valueAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                updateAnimation(getWidth(), animation.getAnimatedFraction());
+                invalidate();
+            }
+        });
 	}
 
-	@Override
-	public void onDraw(Canvas canvas) {
-		canvas.drawColor(bgColor);
-		long dt;
-		if (state != STATE_STARTED) {
-			dt = 0;
-		} else {
-			long endTime = System.currentTimeMillis();
-			dt = endTime - startTime;
-			startTime = endTime;
-		}
-		float left = getPaddingLeft();
-		float right = getPaddingRight();
-		float maxWidth = 1f * (getWidth() - (left + right)) / LAYERS_COUNT;
-		float spacing = maxWidth * 0.1f;
-		float size = maxWidth - spacing;
-		float halfSize = size / 2f;
+    private void updateAnimation(float width, float dt) {
+        float left = getPaddingLeft();
+        float right = getPaddingRight();
+        float maxWidth = 1f * (width - (left + right)) / LAYERS_COUNT;
+        float spacing = maxWidth * 0.1f;
+        float size = maxWidth - spacing;
+        float halfSize = size / 2f;
 
+        for (int i = 0; i< LAYERS_COUNT; i++) {
+            float l = left + i * (size + spacing);
+            float t = getHeight() / 2f - halfSize;
+            float r = l + size;
+            float b = t + size;
+            bounds.set(l, t, r, b);
+            layers[i].update(bounds, dt);
+            if (i == 1) {
+                yellowRectangle.setFirstValues(bounds.centerX(), bounds.centerY());
+            } else if (i == 2) {
+                yellowRectangle.setSecondValues(bounds.centerX(), bounds.centerY());
+            } else if (i == 3) {
+                yellowRectangle.setThirdValues(bounds.centerX(), bounds.centerY());
+                yellowRectangle.updateRadius(bounds.height());
+            }
+        }
+        yellowRectangle.update(bounds, dt);
+    }
+
+    @Override
+	public void onDraw(Canvas canvas) {
+        if (isInEditMode()) {
+            if (random == null) {
+                random = new Random();
+            }
+            updateAnimation(canvas.getWidth(), random.nextFloat());
+        }
+		canvas.drawColor(bgColor);
 		for (int i = 0; i< LAYERS_COUNT; i++) {
-			float l = left + i * (size + spacing);
-			float t = getHeight() / 2f - halfSize;
-			float r = l + size;
-			float b = t + size;
-			bounds.set(l, t, r, b);
-			layers[i].update(bounds, dt);
 			layers[i].draw(canvas);
-			if (i == 1) {
-				yellowRectangle.setFirstValues(bounds.centerX(), bounds.centerY());
-			} else if (i == 2) {
-				yellowRectangle.setSecondValues(bounds.centerX(), bounds.centerY());
-			} else if (i == 3) {
-				yellowRectangle.setThirdValues(bounds.centerX(), bounds.centerY());
-				yellowRectangle.updateRadius(bounds.height());
-			}
 		}
-		yellowRectangle.update(bounds, dt);
 		yellowRectangle.draw(canvas);
 	}
 
@@ -164,44 +173,34 @@ public class LoadingAnimationView extends View {
 	 * Start animation.
 	 */
 	public void startAnimation() {
-		if (state == STATE_STARTED) {
-			return;
-		}
-		state = STATE_STARTED;
-		startTime = System.currentTimeMillis();
-		timer = new Timer("Android M Animation Timer");
-		timer.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				postInvalidate();
-			}
-		}, UPDATE_INTERVAL, UPDATE_INTERVAL);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && valueAnimator.isPaused()) {
+            valueAnimator.resume();
+            return;
+        }
+        if (valueAnimator.isRunning())
+            return;
+        valueAnimator.start();
 	}
 
 	/**
-	 * Pause animation.
+	 * Pause animation. It behaves like {@link #stopAnimation()} on API < 19.
 	 */
-	public void pauseAnimation() {
-		if (state != STATE_STARTED) {
-			return;
-		}
-		timer.cancel();
-		timer.purge();
-		state = STATE_PAUSED;
-		invalidate();
+    public void pauseAnimation() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+            stopAnimation();
+        } else if (!valueAnimator.isPaused()) {
+            valueAnimator.pause();
+        }
 	}
 
 	/**
 	 * Stop animation.
 	 */
 	public void stopAnimation() {
-		if (state == STATE_STOPPED) {
-			return;
-		}
-		timer.cancel();
-		timer.purge();
-		state = STATE_STOPPED;
-		startTime = 0;
+        if (!valueAnimator.isRunning()) {
+            return;
+        }
+		valueAnimator.cancel();
 		resetAll();
 		invalidate();
 	}
@@ -213,14 +212,14 @@ public class LoadingAnimationView extends View {
 		yellowRectangle.reset();
 	}
 
-	/**
-	 * Get current state of animation.
-	 * @return current state of animation.
-	 * @see #STATE_STARTED
-	 * @see #STATE_PAUSED
-	 * @see #STATE_STOPPED
-	 */
-	public int getState() {
-		return state;
-	}
+    /**
+     * Check current state of animation.
+     * @return true if animation is running, false otherwise
+     */
+    public boolean isRunning() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && valueAnimator.isPaused()) {
+            return false;
+        }
+        return valueAnimator.isRunning();
+    }
 }

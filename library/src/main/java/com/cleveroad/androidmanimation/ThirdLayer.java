@@ -20,7 +20,7 @@ class ThirdLayer extends Layer {
 	}
 
 	@Override
-	public void update(@NonNull RectF bounds, long dt) {
+	public void update(@NonNull RectF bounds, float dt) {
 		for (DrawableObject object : objects) {
 			object.update(bounds, dt);
 		}
@@ -97,7 +97,7 @@ class ThirdLayer extends Layer {
 		}
 
 		@Override
-		protected void update(@NonNull RectF bounds, long dt, float ddt) {
+		protected void updateImpl(@NonNull RectF bounds, float ddt) {
 			greenSize = computeGreenSizeFraction(ddt) * getBounds().width();
 			blackSize = computeBlackSizeFraction(ddt) * getBounds().width();
 			if (drawArc) {
@@ -221,7 +221,7 @@ class ThirdLayer extends Layer {
 		}
 
 		@Override
-		protected void update(@NonNull RectF bounds, long dt, float ddt) {
+		protected void updateImpl(@NonNull RectF bounds, float ddt) {
 			redSize = computeRedSizeFraction(ddt) * getBounds().width();
 			blackSize = computeBlackSizeFraction(ddt) * getBounds().width();
 			if (ddt <= ROTATION_FRACTION_START) {
@@ -321,7 +321,7 @@ class ThirdLayer extends Layer {
 		}
 
 		@Override
-		protected void update(@NonNull RectF bounds, long dt, float ddt) {
+		protected void updateImpl(@NonNull RectF bounds, float ddt) {
 			redSize = computeRedSizeFraction(ddt) * getBounds().width();
 			blackSize = computeBlackSizeFraction(ddt) * getBounds().width();
 		}
